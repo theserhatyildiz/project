@@ -13,7 +13,7 @@ export default function VerifyEmail() {
 
     async function fetchCsrfToken() {
         try {
-            const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+            const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
             const { csrfToken } = await response.json();
             // console.log('CSRF Token fetched:', csrfToken);
             if (csrfToken) {
@@ -31,7 +31,7 @@ export default function VerifyEmail() {
     async function verifyEmail(csrfToken) {
         try {
             // console.log('XSRF-TOKEN cookie:', csrfToken); // Log CSRF token from cookie
-            const response = await fetch(`http://localhost:8000/verify/${id}/${token}`, {
+            const response = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/verify/${id}/${token}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -26,7 +26,7 @@ export function useAuth() {
     const accessToken = storedUser?.token || loggedUser?.token;
   
     try {
-      await fetch("http://localhost:8000/logout", {
+      await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/logout", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${accessToken}`,
@@ -55,7 +55,7 @@ export function useAuth() {
     isRefreshingRef.current = true;
 
     try {
-      const response = await fetch('http://localhost:8000/refresh-token', {
+      const response = await fetch('https://galwinapp1-c1d71c579009.herokuapp.com/refresh-token', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export function useAuth() {
 
         // 🔁 Call logout on backend explicitly
         try {
-          const logoutRes = await fetch("http://localhost:8000/logout", {
+          const logoutRes = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/logout", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export function useAuth() {
   async function fetchCsrfToken() {
     console.log('Fetching CSRF token...');
     try {
-      const response = await fetch("http://localhost:8000/csrf-token", {
+      const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", {
         credentials: 'include'
       });
 
