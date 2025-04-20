@@ -39,7 +39,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     {/* Register & Login */}
-                    <Route path='/' element={<Diet />} />
+                    <Route path='/' element={<Login />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/forgotpassword' element={<ForgotPassword />} />
                     <Route path='/resetpassword/:id/:token' element={<ResetPassword />} />
