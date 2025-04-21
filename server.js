@@ -467,125 +467,125 @@ function turkishInsensitiveRegex(searchQuery) {
     'ğ': ['g', 'ğ', 'G', 'Ğ'],
   };
 
-  const regexStr = searchQuery.split('').map(char => {
-    const lowerChar = char.toLowerCase();
-    if (charMap[lowerChar]) {
-      const chars = charMap[lowerChar];
-      return `[${[...new Set(chars)].join('')}]`;
-    } else {
-      return char;
-    }
-  }).join('');
+  return searchQuery.trim().split(/\s+/).map(word => {
+    const regexStr = word.split('').map(char => {
+      const lowerChar = char.toLowerCase();
+      if (charMap[lowerChar]) {
+        const chars = charMap[lowerChar];
+        return `[${[...new Set(chars)].join('')}]`;
+      } else {
+        return char;
+      }
+    }).join('');
 
-  return new RegExp(`${regexStr}`, 'i'); // match from start, case-insensitive
+    return new RegExp(regexStr, 'i'); // match anywhere
+  });
 }
 
-app.get('/foods/:name', 
-[
-  param('name')
-    .trim()
-    .matches(/^[a-zA-ZıİşŞğĞüÜöÖçÇ\s]+$/)
-    .withMessage('Invalid query parameter: Only letters and spaces are allowed')
-    .isLength({ max: 50 })
-    .withMessage('Name parameter cannot exceed 50 characters')
-    .customSanitizer(value => sanitizeHtml(value)),
-],
-verifyToken,
-async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+app.get('/foods/:name',
+  [
+    param('name')
+      .trim()
+      .matches(/^[a-zA-ZıİşŞğĞüÜöÖçÇ\s]+$/)
+      .withMessage('Invalid query parameter: Only letters and spaces are allowed')
+      .isLength({ max: 50 })
+      .withMessage('Name parameter cannot exceed 50 characters')
+      .customSanitizer(value => sanitizeHtml(value)),
+  ],
+  verifyToken,
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+  
+      const query = sanitizeHtml(req.params.name.trim());
+      const regexPatterns = turkishInsensitiveRegex(query); // returns array
+  
+      // Get user foods and default foods
+      let userFoods = await foodModel.find({ userId: req.userId }).lean();
+      let defaultFoods = await foodModel.find({ userId: { $exists: false } }).lean();
+  
+      // Merge and filter using regexPatterns
+      let foods = [...userFoods, ...defaultFoods].filter(food =>
+        regexPatterns.every(pattern => pattern.test(food.NameTr))
+      );
+  
+      // Sort to prioritize prefix matches
+      foods = foods.sort((a, b) => {
+        const aName = a.NameTr.toLowerCase();
+        const bName = b.NameTr.toLowerCase();
+        const q = query.toLowerCase();
+        const aStarts = aName.startsWith(q);
+        const bStarts = bName.startsWith(q);
+  
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return aName.localeCompare(bName);
+      });
+  
+      if (foods.length !== 0) {
+        res.send(foods);
+      } else {
+        res.status(404).send({ message: 'Food item not found' });
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: 'Some problem in getting the food using search' });
     }
+  });
 
-    const query = sanitizeHtml(req.params.name.trim());
-    const regexPattern = turkishInsensitiveRegex(query);
-
-    const userFoods = await foodModel.find({ 
-      NameTr: { $regex: regexPattern },
-      userId: req.userId 
+  app.get('/userfoods/:name',
+    [
+      param('name')
+        .trim()
+        .matches(/^[a-zA-ZıİşŞğĞüÜöÖçÇ\s]+$/)
+        .withMessage('Invalid query parameter: Only letters and spaces are allowed')
+        .isLength({ max: 50 })
+        .withMessage('Name parameter cannot exceed 50 characters')
+        .customSanitizer(value => sanitizeHtml(value)),
+    ],
+    verifyToken,
+    async (req, res) => {
+      try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
+    
+        const query = sanitizeHtml(req.params.name.trim());
+        const regexPatterns = turkishInsensitiveRegex(query); // returns array
+    
+        let userFoods = await userFoodModel.find({ userId: req.userId }).lean();
+    
+        userFoods = userFoods.filter(food =>
+          regexPatterns.every(pattern => pattern.test(food.NameTr))
+        );
+    
+        // Sort userFoods to prioritize prefix matches
+        userFoods = userFoods.sort((a, b) => {
+          const aName = a.NameTr.toLowerCase();
+          const bName = b.NameTr.toLowerCase();
+          const q = query.toLowerCase();
+          const aStarts = aName.startsWith(q);
+          const bStarts = bName.startsWith(q);
+    
+          if (aStarts && !bStarts) return -1;
+          if (!aStarts && bStarts) return 1;
+          return aName.localeCompare(bName);
+        });
+    
+        if (userFoods.length !== 0) {
+          res.json(userFoods);
+        } else {
+          res.status(404).json({ message: 'User food item not found' });
+        }
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Some problem in getting the user food using search' });
+      }
     });
-
-    const defaultFoods = await foodModel.find({ 
-      NameTr: { $regex: regexPattern },
-      userId: { $exists: false }
-    });
-
-    let foods = [...userFoods, ...defaultFoods];
-
-    // Sort: prioritize foods that start with the query
-    foods = foods.sort((a, b) => {
-      const aName = a.NameTr.toLowerCase();
-      const bName = b.NameTr.toLowerCase();
-      const q = query.toLowerCase();
-      const aStarts = aName.startsWith(q);
-      const bStarts = bName.startsWith(q);
-
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      return aName.localeCompare(bName);
-    });
-
-    if (foods.length !== 0) {
-      res.send(foods);
-    } else {
-      res.status(404).send({ message: 'Food item not found' });
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ message: 'Some problem in getting the food using search' });
-  }
-});
-
-app.get('/userfoods/:name', 
-[
-  param('name')
-    .trim()
-    .matches(/^[a-zA-ZıİşŞğĞüÜöÖçÇ\s]+$/)
-    .withMessage('Invalid query parameter: Only letters and spaces are allowed')
-    .isLength({ max: 50 })
-    .withMessage('Name parameter cannot exceed 50 characters')
-    .customSanitizer(value => sanitizeHtml(value)),
-],
-verifyToken,
-async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const query = sanitizeHtml(req.params.name.trim());
-    const regexPattern = turkishInsensitiveRegex(query);
-
-    let userFoods = await userFoodModel.find({
-      NameTr: { $regex: regexPattern },
-      userId: req.userId
-    });
-
-    // Sort userFoods to prioritize prefix matches
-    userFoods = userFoods.sort((a, b) => {
-      const aName = a.NameTr.toLowerCase();
-      const bName = b.NameTr.toLowerCase();
-      const q = query.toLowerCase();
-      const aStarts = aName.startsWith(q);
-      const bStarts = bName.startsWith(q);
-
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      return aName.localeCompare(bName);
-    });
-
-    if (userFoods.length !== 0) {
-      res.json(userFoods);
-    } else {
-      res.status(404).json({ message: 'User food item not found' });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Some problem in getting the user food using search' });
-  }
-});
 
 // end point to fetch all foods eaten by a user
 
