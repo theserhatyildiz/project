@@ -477,7 +477,7 @@ function turkishInsensitiveRegex(searchQuery) {
     }
   }).join('');
 
-  return new RegExp(`^${regexStr}`, 'i'); // match from start, case-insensitive
+  return new RegExp(`${regexStr}`, 'i'); // match from start, case-insensitive
 }
 
 app.get('/foods/:name', 
