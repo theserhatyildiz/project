@@ -450,8 +450,9 @@ app.get("/foods", verifyToken, async (req, res) => {
 
 // end point for search food by name
 
-// Turkish-insensitive regex function
-function turkishInsensitiveRegex(searchQuery) {
+// Turkish-insensitive multi-word regex function
+function turkishInsensitiveMultiRegex(query) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const charMap = {
     'i': ['i', 'ı', 'İ', 'I'],
     'ı': ['i', 'ı', 'İ', 'I'],
@@ -467,17 +468,18 @@ function turkishInsensitiveRegex(searchQuery) {
     'ğ': ['g', 'ğ', 'G', 'Ğ'],
   };
 
-  const regexStr = searchQuery.split('').map(char => {
-    const lowerChar = char.toLowerCase();
-    if (charMap[lowerChar]) {
-      const chars = charMap[lowerChar];
-      return `[${[...new Set(chars)].join('')}]`;
-    } else {
-      return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex special chars
-    }
-  }).join('');
-
-  return new RegExp(`${regexStr}`, 'i'); 
+  return words.map(word => {
+    const pattern = word.split('').map(char => {
+      const lowerChar = char.toLowerCase();
+      if (charMap[lowerChar]) {
+        const chars = charMap[lowerChar];
+        return `[${[...new Set(chars)].join('')}]`;
+      } else {
+        return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+    }).join('');
+    return new RegExp(pattern, 'i');
+  });
 }
 
 // Shared sort function to prioritize prefix matches
@@ -515,17 +517,22 @@ async (req, res) => {
     }
 
     const query = sanitizeHtml(req.params.name.trim());
-    const regexPattern = turkishInsensitiveRegex(query);
+    const regexPatterns = turkishInsensitiveMultiRegex(query);
 
-    const [userFoods, defaultFoods] = await Promise.all([
-      foodModel.find({ NameTr: { $regex: regexPattern }, userId: req.userId }),
-      foodModel.find({ NameTr: { $regex: regexPattern }, userId: { $exists: false } })
+    const [userFoodsRaw, defaultFoodsRaw] = await Promise.all([
+      foodModel.find({ userId: req.userId }),
+      foodModel.find({ userId: { $exists: false } })
     ]);
 
-    let foods = prioritizeStartsWith(query, [...userFoods, ...defaultFoods]);
+    const allFoods = [...userFoodsRaw, ...defaultFoodsRaw].filter(food => {
+      const name = food.NameTr || '';
+      return regexPatterns.every(regex => regex.test(name));
+    });
 
-    if (foods.length > 0) {
-      res.json(foods);
+    const sortedFoods = prioritizeStartsWith(query, allFoods);
+
+    if (sortedFoods.length > 0) {
+      res.json(sortedFoods);
     } else {
       res.status(404).json({ message: 'Food item not found' });
     }
@@ -555,17 +562,19 @@ async (req, res) => {
     }
 
     const query = sanitizeHtml(req.params.name.trim());
-    const regexPattern = turkishInsensitiveRegex(query);
+    const regexPatterns = turkishInsensitiveMultiRegex(query);
 
-    let userFoods = await userFoodModel.find({
-      NameTr: { $regex: regexPattern },
-      userId: req.userId
+    const userFoodsRaw = await userFoodModel.find({ userId: req.userId });
+
+    const filtered = userFoodsRaw.filter(food => {
+      const name = food.NameTr || '';
+      return regexPatterns.every(regex => regex.test(name));
     });
 
-    userFoods = prioritizeStartsWith(query, userFoods);
+    const sorted = prioritizeStartsWith(query, filtered);
 
-    if (userFoods.length > 0) {
-      res.json(userFoods);
+    if (sorted.length > 0) {
+      res.json(sorted);
     } else {
       res.status(404).json({ message: 'User food item not found' });
     }
