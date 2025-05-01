@@ -46,7 +46,7 @@ export default function MealFunctions() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 if (csrfToken) {
                     setCsrfToken(csrfToken);
@@ -73,7 +73,7 @@ export default function MealFunctions() {
         const queryParams = new URLSearchParams(location.search);
         const eatenDateParam = queryParams.get("eatenDate");
 
-        fetch(`http://localhost:8000/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
