@@ -37,10 +37,37 @@ export default function MealFunctions() {
         const diffInMs = inputDate - today;
         const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
     
-        if (diffInDays === 0) return " Bugün:";
-        if (diffInDays === 1) return " Yarın:";
-        if (diffInDays === -1) return " Dün:";
-        return "";
+        // Get user's language setting (default to 'en-US' if not set)
+        const userLanguage = navigator.language || 'en-US';
+    
+        // Get options for the weekday formatting
+        const weekdayOptions = { weekday: 'short' };
+        const weekday = inputDate.toLocaleDateString(userLanguage, weekdayOptions);
+    
+        if (diffInDays === 0) return ` ${getLocalizedText(userLanguage, 'today')}:`;
+        if (diffInDays === 1) return ` ${getLocalizedText(userLanguage, 'tomorrow')}:`;
+        if (diffInDays === -1) return ` ${getLocalizedText(userLanguage, 'yesterday')}:`;
+    
+        // For other days, return the day of the week
+        return `${weekday}:`;
+    }
+    
+    function getLocalizedText(language, key) {
+        const localizedTexts = {
+            'en-US': {
+                today: 'Today',
+                tomorrow: 'Tomorrow',
+                yesterday: 'Yesterday'
+            },
+            'tr-TR': {
+                today: 'Bugün',
+                tomorrow: 'Yarın',
+                yesterday: 'Dün'
+            },
+            // Add more languages here if needed
+        };
+    
+        return localizedTexts[language] ? localizedTexts[language][key] : localizedTexts['en-US'][key];
     }
 
     useEffect(() => {
