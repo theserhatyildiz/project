@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
-import { useContext } from "react";
 import DeleteCopyFunction from "./DeleteCopyFunction";
 import ClipLoader from "react-spinners/ClipLoader";
 
 export default function MealFunctions() {
-    let loggedData = useContext(UserContext);
+    const loggedData = useContext(UserContext);
     const [date, setDate] = useState(new Date());
     const [displayMealNumber, setDisplayMealNumber] = useState(1);
     const [copyMealNumber, setCopyMealNumber] = useState(1);
     const [foodsByMeal, setFoodsByMeal] = useState({});
     const [selectedFoods, setSelectedFoods] = useState([]);
-    const [copyDate, setCopyDate] = useState(formatDate(new Date())); // Format copyDate
+    const [copyDate, setCopyDate] = useState(formatDate(new Date()));
     const [message, setMessage] = useState({ type: "", text: "" });
     const location = useLocation();
-    const [loading, setLoading] = useState(true); // Initial loading state set to true
-    const [color] = useState("#d73750"); // Color state for ClipLoader
+    const [loading, setLoading] = useState(true);
+    const [color] = useState("#d73750");
     const [csrfToken, setCsrfToken] = useState('');
+    const [selectAll, setSelectAll] = useState(false);
 
-    // Function to format date as "YYYY-MM-DD"
     function formatDate(date) {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -35,7 +34,7 @@ export default function MealFunctions() {
         const initialMealNumber = mealNumberParam ? parseInt(mealNumberParam) : 1;
         setDisplayMealNumber(initialMealNumber);
         setCopyMealNumber(initialMealNumber);
-        setCopyDate(formatDate(initialDate)); // Update copyDate with formatted initialDate
+        setCopyDate(formatDate(initialDate));
     }, [location]);
 
     useEffect(() => {
@@ -47,28 +46,34 @@ export default function MealFunctions() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
-                console.log('CSRF Token fetched:', csrfToken);
                 if (csrfToken) {
                     setCsrfToken(csrfToken);
                     document.cookie = `XSRF-TOKEN=${csrfToken}; Secure; SameSite=Strict; path=/`;
-                    console.log('CSRF Token stored in cookie:', csrfToken);
                 }
             } catch (error) {
                 console.error('Error fetching CSRF token:', error);
             }
         }
-
         fetchCsrfToken();
     }, []);
 
+    // ✅ New useEffect to update selectAll based on selection
+    useEffect(() => {
+        const allFoods = foodsByMeal[displayMealNumber] || [];
+        const allSelected = allFoods.length > 0 && allFoods.every(food =>
+            selectedFoods.some(selected => selected._id === food._id)
+        );
+        setSelectAll(allSelected);
+    }, [selectedFoods, foodsByMeal, displayMealNumber]);
+
     const fetchFoodItems = (mealNumber) => {
-        setLoading(true); // Set loading to true before fetching data
+        setLoading(true);
         const queryParams = new URLSearchParams(location.search);
         const eatenDateParam = queryParams.get("eatenDate");
 
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
+        fetch(`http://localhost:8000/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -88,11 +93,13 @@ export default function MealFunctions() {
                 ...prevState,
                 [mealNumber]: data
             }));
-            setLoading(false); // Set loading to false after data is fetched
+            setSelectedFoods([]); // Clear selections when new meal is loaded
+            setSelectAll(false); // Reset Select All
+            setLoading(false);
         })
         .catch((error) => {
             console.error("Error fetching food items:", error);
-            setLoading(false); // Set loading to false even if there is an error
+            setLoading(false);
         });
     };
 
@@ -112,18 +119,26 @@ export default function MealFunctions() {
             const updatedSelected = isChecked
                 ? [...prevSelected, foodToAdd]
                 : prevSelected.filter(food => food._id !== foodId);
-            console.log("Selected foods after change:", updatedSelected);
             return updatedSelected;
         });
     };
 
-    console.log("Copy Date:", copyDate);
+    const handleSelectAllChange = (event) => {
+        const isChecked = event.target.checked;
+        setSelectAll(isChecked);
+
+        if (isChecked) {
+            setSelectedFoods([...foodsByMeal[displayMealNumber]]);
+        } else {
+            setSelectedFoods([]);
+        }
+    };
 
     function formatNumber(number) {
         if (number % 1 === 0) {
-            return number.toString(); // No decimals if the number is an integer
+            return number.toString();
         } else {
-            return parseFloat(number.toFixed(1)).toString(); // Convert to float to remove trailing zeros and then to string
+            return parseFloat(number.toFixed(1)).toString();
         }
     }
 
@@ -142,36 +157,54 @@ export default function MealFunctions() {
                         />
                     </div>
                 ) : (
-                    foodsByMeal[displayMealNumber] && foodsByMeal[displayMealNumber].map((food, index) => (
-                        <ul key={index}>
-                            <li>
-                                <div className="check-box-container">
-                                    <div className="check-box">
-                                        <input 
-                                            type="checkbox" 
-                                            value={food._id} 
-                                            onChange={(event) => handleCheckboxChange(event, food._id)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <h4>{food.details.Name}</h4>
-                                    </div>
+                    foodsByMeal[displayMealNumber] && (
+                        <>
+                            <div className="select-all">
+                                <div className="check-box">
+                                    <input 
+                                        type="checkbox"
+                                        checked={selectAll}
+                                        onChange={handleSelectAllChange}
+                                    />
                                 </div>
-                                <div className="food-info">
-                                    <h4>{food.quantity}g -</h4>
-                                    <p>{formatNumber(food.details.Calorie)} cal: {formatNumber(food.details.Protein)}p, {formatNumber(food.details.Carbohydrate)}k, {formatNumber(food.details.Fat)}y, {formatNumber(food.details.Fiber)}lif</p>
+                                <div>
+                                    <h4>Tümünü Seç</h4>
                                 </div>
-                            </li>
-                        </ul>
-                    ))
+                            </div>
+
+                            {foodsByMeal[displayMealNumber].map((food, index) => (
+                                <ul key={index}>
+                                    <li>
+                                        <div className="check-box-container">
+                                            <div className="check-box">
+                                                <input 
+                                                    type="checkbox" 
+                                                    value={food._id} 
+                                                    checked={selectedFoods.some(selected => selected._id === food._id)}
+                                                    onChange={(event) => handleCheckboxChange(event, food._id)}
+                                                />
+                                            </div>
+                                            <div>
+                                                <h4>{food.details.Name}</h4>
+                                            </div>
+                                        </div>
+                                        <div className="food-info">
+                                            <h4>{food.quantity}g -</h4>
+                                            <p>{formatNumber(food.details.Calorie)} cal: {formatNumber(food.details.Protein)}p, {formatNumber(food.details.Carbohydrate)}k, {formatNumber(food.details.Fat)}y, {formatNumber(food.details.Fiber)}lif</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            ))}
+                        </>
+                    )
                 )}
             </div>
             <div>
                 <input
                     className="meal-function-date-box"
                     type="date"
-                    value={copyDate} // Use copyDate directly
-                    onChange={(event) => setCopyDate(formatDate(new Date(event.target.value)))} // Update copyDate
+                    value={copyDate}
+                    onChange={(event) => setCopyDate(formatDate(new Date(event.target.value)))}
                 />
                 <select className="meal-selection" onChange={handleCopyMealNumberChange} value={copyMealNumber.toString()}>
                     {[1, 2, 3, 4, 5, 6].map((number) => (
@@ -193,10 +226,8 @@ export default function MealFunctions() {
                 mealNumber={copyMealNumber}
                 copyDate={copyDate}
                 refreshFoods={refreshFoods}
-                setMessage={setMessage}  // Pass the setMessage function to DeleteCopyFunction
+                setMessage={setMessage}
             />
         </section>
     );
 }
-
-

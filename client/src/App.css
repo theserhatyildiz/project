@@ -995,6 +995,17 @@ label input{
     border-bottom: 1px solid rgb(227, 224, 224);
 }
 
+.meal-function-container .select-all{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.45rem;
+    padding-bottom: 0.25rem;
+    /* padding-top: 0.25rem; */
+    list-style: none;
+    border-bottom: 1px solid rgb(227, 224, 224);
+    /* border-top: 1px solid rgb(227, 224, 224); */
+}
+
 .check-box-container{
     display: flex;
     flex-direction: row;
