@@ -1032,6 +1032,7 @@ label input{
 
 .date-meal-section p{
    font-weight: bold;
+   font-size: 1.1rem;
 
 }
 
@@ -1040,10 +1041,10 @@ label input{
     width: 55%;
     border-radius: 0.35rem;
     border: none;
-    background-color: rgb(255, 252, 252);
+    background-color: rgb(244, 242, 242);
     margin-right: 1rem;
     padding-left: 0.1rem;
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 .meal-function-footer-wrapper {
