@@ -1024,14 +1024,25 @@ label input{
     font-size: 0.75rem;
 }
 
+.date-meal-section{
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+}
+
+.date-meal-section p{
+   font-weight: bold;
+
+}
+
 .meal-function-date-box{
     border: none;
     width: 55%;
     border-radius: 0.35rem;
     border: none;
-    background-color: rgb(244, 242, 242);
+    background-color: rgb(255, 252, 252);
     margin-right: 1rem;
-    padding: 0.1rem 1rem;
+    padding-left: 0.1rem;
     font-size: 1rem;
 }
 

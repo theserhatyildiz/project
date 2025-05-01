@@ -26,6 +26,23 @@ export default function MealFunctions() {
         return `${year}-${month}-${day}`;
     }
 
+    function getRelativeDayLabel(dateStr) {
+        const inputDate = new Date(dateStr);
+        const today = new Date();
+    
+        // Clear time for comparison
+        today.setHours(0, 0, 0, 0);
+        inputDate.setHours(0, 0, 0, 0);
+    
+        const diffInMs = inputDate - today;
+        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    
+        if (diffInDays === 0) return " Bugün:";
+        if (diffInDays === 1) return " Yarın:";
+        if (diffInDays === -1) return " Dün:";
+        return "";
+    }
+
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);
         const mealNumberParam = queryParams.get("mealNumber");
@@ -46,7 +63,7 @@ export default function MealFunctions() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 if (csrfToken) {
                     setCsrfToken(csrfToken);
@@ -73,7 +90,7 @@ export default function MealFunctions() {
         const queryParams = new URLSearchParams(location.search);
         const eatenDateParam = queryParams.get("eatenDate");
 
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
+        fetch(`http://localhost:8000/track/${loggedData.loggedUser.userid}/${mealNumber}/${eatenDateParam}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -199,13 +216,15 @@ export default function MealFunctions() {
                     )
                 )}
             </div>
-            <div>
+            <div className="date-meal-section">
+            <p>{getRelativeDayLabel(copyDate)}</p>
                 <input
                     className="meal-function-date-box"
                     type="date"
                     value={copyDate}
                     onChange={(event) => setCopyDate(formatDate(new Date(event.target.value)))}
                 />
+                
                 <select className="meal-selection" onChange={handleCopyMealNumberChange} value={copyMealNumber.toString()}>
                     {[1, 2, 3, 4, 5, 6].map((number) => (
                         <option key={number} value={number}>
