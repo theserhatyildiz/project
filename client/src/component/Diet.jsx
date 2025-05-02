@@ -29,7 +29,7 @@ export default function Diet() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 console.log('CSRF Token fetched:', csrfToken);
                 if (csrfToken) {
@@ -48,7 +48,7 @@ export default function Diet() {
     // ------------------Functions------------------
 
     useEffect(() => {
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
@@ -91,7 +91,7 @@ export default function Diet() {
     };
 
     function deleteFood(itemId) {
-        return fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${itemId}`, {
+        return fetch(`http://localhost:8000/track/${itemId}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
@@ -157,32 +157,34 @@ export default function Diet() {
         mealItems.push(...mealItemsArray);
     });
 
-    // Check if the current date is today, yesterday, or tomorrow
-    const getRelativeDay = (date) => {
+    // ------------------Updated getRelativeDayLabel function------------------
+    const getRelativeDayLabel = (dateStr) => {
+        const inputDate = new Date(dateStr);
         const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
 
-        if (date.getDate() === today.getDate() &&
-            date.getMonth() === today.getMonth() &&
-            date.getFullYear() === today.getFullYear()) {
-            return "bugün";
-        } else if (date.getDate() === yesterday.getDate() &&
-                   date.getMonth() === yesterday.getMonth() &&
-                   date.getFullYear() === yesterday.getFullYear()) {
-            return "dün";
-        } else if (date.getDate() === tomorrow.getDate() &&
-                   date.getMonth() === tomorrow.getMonth() &&
-                   date.getFullYear() === tomorrow.getFullYear()) {
-            return "yarın";
-        } else {
-            return null;
-        }
+        // Normalize both dates to midnight
+        today.setHours(0, 0, 0, 0);
+        inputDate.setHours(0, 0, 0, 0);
+
+        const diffInMs = inputDate - today;
+        const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+        const localizedTexts = {
+            today: 'Bugün',
+            tomorrow: 'Yarın',
+            yesterday: 'Dün'
+        };
+
+        const weekday = inputDate.toLocaleDateString('tr-TR', { weekday: 'short' });
+
+        if (diffInDays === 0) return `${localizedTexts.today}:`;
+        if (diffInDays === 1) return `${localizedTexts.tomorrow}:`;
+        if (diffInDays === -1) return `${localizedTexts.yesterday}:`;
+
+        return `${weekday}:`;
     };
 
-    const relativeDay = getRelativeDay(currentDateView);
+    const relativeDay = getRelativeDayLabel(currentDateView);
 
     const changeDate = (offset) => {
         console.log('Current Date View before change:', currentDateView.toISOString());
@@ -215,7 +217,7 @@ export default function Diet() {
                         <div className="fixed-header">
                             <div className="day-date">
                                 <button onClick={() => changeDate(-1)}>{"<"}</button>
-                                {relativeDay && <p>{relativeDay}: </p>}
+                                {relativeDay && <p>{relativeDay}</p>}
                                 <input 
                                     className="date-box" 
                                     type="date" 
@@ -256,6 +258,7 @@ export default function Diet() {
                         <div className="scrollable-content">
                         {meals.map((meal) => {
                             // Format the date as MM/DD/YYYY
+                           
                             const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
                             console.log(`Diet Eaten Date: ${eatenDate}`);
                             return (
