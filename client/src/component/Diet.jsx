@@ -164,7 +164,7 @@ export default function Diet() {
         yesterday.setDate(today.getDate() - 1);
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
-
+    
         if (date.getDate() === today.getDate() &&
             date.getMonth() === today.getMonth() &&
             date.getFullYear() === today.getFullYear()) {
@@ -178,7 +178,8 @@ export default function Diet() {
                    date.getFullYear() === tomorrow.getFullYear()) {
             return "yarın";
         } else {
-            return null;
+            const weekdays = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
+            return weekdays[date.getDay()];
         }
     };
 
