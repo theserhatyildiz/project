@@ -995,6 +995,7 @@ label input{
     border-radius: 0.25rem;
     font-size: 0.95rem;
     margin: 1rem auto 0 auto; /* 👈 this centers the div */
+    margin-top: -0.5rem;
     text-align: center; /* optional: center the text */
     font-weight: bold;
 }
