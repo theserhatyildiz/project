@@ -1130,20 +1130,6 @@ app.post('/update-username', async (req, res) => {
     }
 });
 
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the Vite build output
-  app.use(express.static(path.join(__dirname, '/client/dist')));
-
-  // Handle all SPA routes
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/client/dist/index.html'));
-  });
-} else {
-  // For dev/testing environments
-  app.get('/', (req, res) => {
-    res.send('API running');
-  });
-}
 
 /////////////////////////// GOALS ///////////////////////////
 
@@ -1243,6 +1229,21 @@ app.get("/macro-goals", verifyToken, async (req, res) => {
     return res.status(500).json({ message: "Server error fetching macro goals" });
   }
 });
+
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the Vite build output
+  app.use(express.static(path.join(__dirname, '/client/dist')));
+
+  // Handle all SPA routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/client/dist/index.html'));
+  });
+} else {
+  // For dev/testing environments
+  app.get('/', (req, res) => {
+    res.send('API running');
+  });
+}
 
 app.listen(process.env.PORT || PORT, () => {
     console.log('Server is running !!!')
