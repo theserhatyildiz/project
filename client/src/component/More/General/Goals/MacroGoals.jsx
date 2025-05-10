@@ -38,23 +38,32 @@ export default function MacroGoals() {
         const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
           headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
-            "CSRF-Token": csrfToken // Include CSRF token in headers
+            "CSRF-Token": csrfToken
           },
           credentials: 'include'
         });
-        if (!response.ok) throw new Error("Failed to fetch macro goals");
-
-        const data = await response.json();
-        setMacroGoals(data);
+  
+        const text = await response.text(); // get raw response text
+        console.log("Raw response text:", text); // debug output
+  
+        if (!response.ok) throw new Error(`Failed to fetch macro goals: ${response.status}`);
+  
+        try {
+          const data = JSON.parse(text); // attempt to parse JSON
+          setMacroGoals(data);
+        } catch (parseError) {
+          console.error("Failed to parse response as JSON:", parseError);
+        }
+  
       } catch (error) {
         console.error("Error fetching macro goals:", error);
       }
     }
-
+  
     if (loggedUser?.token) {
       fetchMacroGoals();
     }
-  }, [loggedUser]);
+  }, [loggedUser, csrfToken]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
