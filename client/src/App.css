@@ -6,7 +6,7 @@ html {
   }
   
 html::-webkit-scrollbar {
-    display: none;                   
+    display: none;                   /* Chrome, Safari */
   }
 
 .container{
@@ -75,6 +75,9 @@ a {
     width: 50;
     padding: 0.30rem;
     border-radius: 0.25rem;
+    margin: 1rem auto 0 auto; /* 👈 this centers the div */
+    text-align: center; /* optional: center the text */
+    font-weight: bold;
 }
 
 .forgotPass-p .success{
@@ -369,7 +372,7 @@ a {
     background-color:white; 
     width: 100%;
     margin-bottom: 4.5rem; /* adjustment for the gap between footer*/
-    margin-top: 0.9rem;
+    margin-top: 2.2rem;
 }
 
 .fixed-header .day-date{
@@ -454,6 +457,12 @@ a {
     font-weight: bold;
     font-size: 1.3rem;
     color: rgb(243, 126, 144);
+}
+
+.macroGoals-digits {
+    color: white;
+    /* border-top: 1px solid white; */
+    
 }
 
 /* meal page css */
@@ -705,7 +714,17 @@ flex-wrap: wrap;
     padding: 0.50rem 0.50rem;
 }
 
-
+.success-createFood{
+    width: 90%;
+    background-color: lightgreen;
+    color: rgb(1, 61, 45);
+    width: 50;
+    padding: 0.30rem;
+    border-radius: 0.25rem;
+    margin-top: -1rem;
+    text-align: center; /* optional: center the text */
+    font-weight: bold;
+}
 
 /* track weight page css */
 
@@ -975,7 +994,9 @@ label input{
     padding: 0.10rem 1.5rem;
     border-radius: 0.25rem;
     font-size: 0.95rem;
-    text-align: center;
+    margin: 1rem auto 0 auto; /* 👈 this centers the div */
+    text-align: center; /* optional: center the text */
+    font-weight: bold;
 }
 
 
@@ -1078,6 +1099,9 @@ label input{
     padding: 0.30rem;
     border-radius: 0.25rem;
     margin-top: 1rem;
+    margin: 1rem auto 0 auto; /* 👈 this centers the div */
+    text-align: center; /* optional: center the text */
+    font-weight: bold;
 }
 
 /* more page css */
@@ -1226,6 +1250,84 @@ border: 3px solid rgb(249, 106, 128);
     font-size: 1rem;
 }
 
+/* goals page css */
+
+.goals-container{
+    display: flex;
+    align-items: flex-start;
+
+}
+
+.goals-list{
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* macrogoals page css */
+
+.macrogoals-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+}
+
+.macrogoals-list .list-headings {
+    display: flex;
+    justify-content:space-between ;
+    align-items: center;
+}
+
+.macro-calories {
+    padding-right: 0.30rem
+}
+
+.macrogoals-list{
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.macro-input input{
+    border: none;
+    text-align: right;
+    padding-right: 0.25rem;
+    font-size: 1rem;
+}
+
+.macro-input span {
+    font-weight: bold;
+}
+
+.macro-btn{
+    display: flex;
+    justify-content: center; /* Aligns horizontally in the center */
+    align-items: center; 
+    width: 100%;
+    background-color: rgb(215, 55, 80);
+    padding: 0.55rem 0.25rem;
+    border: none;
+    border-radius: 0.65rem;
+    margin-top: 0.50rem;
+
+}
+
+.macro-btn button {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.macrogoals-sucess{
+    width: 90%;
+    background-color: lightgreen;
+    color: rgb(1, 61, 45);
+    width: 50;
+    padding: 0.30rem;
+    border-radius: 0.25rem;
+    margin-top: 3rem;
+}
 
 /* about page css */
 
@@ -1258,7 +1360,7 @@ border: 3px solid rgb(249, 106, 128);
     left: 0;
     width: 100%;
     list-style: none;
-    text-decoration: underline;
+    /* text-decoration: underline; */
     text-decoration-color: white;
     text-underline-offset: 8px;
     gap: 1rem;
