@@ -16,6 +16,8 @@ import ResetPassword from './component/ResetPassword'
 import VerifyEmail from './component/VerifyEmail'
 import More from './component/More/More'
 import Account from './component/More/General/Account'
+import Goals from './component/More/General/Goals/Goals'
+import MacroGoals from './component/More/General/Goals/MacroGoals'
 import Profile from './component/More/General/Profile'
 import About from './component/More/HelpInfo/About'
 
@@ -39,7 +41,7 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     {/* Register & Login */}
-                    <Route path='/' element={<Login />} />
+                    <Route path='/' element={<Diet />} />
                     <Route path='/login' element={<Login />} />
                     <Route path='/forgotpassword' element={<ForgotPassword />} />
                     <Route path='/resetpassword/:id/:token' element={<ResetPassword />} />
@@ -60,6 +62,10 @@ function App() {
 
                     {/* General */}
                     <Route path='/account' element={<Private Component={Account} />} />
+
+                    <Route path='/goals' element={<Private Component={Goals} />} />
+                    <Route path='/macrogoals' element={<Private Component={MacroGoals} />} />
+
                     <Route path='/profile' element={<Private Component={Profile} />} />
 
                     {/* Help & Info */}

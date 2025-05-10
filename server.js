@@ -16,11 +16,12 @@ const path = require('path');
 
 const userModel = require('./models/userModel')
 const foodModel =  require('./models/foodModel')
+const macroGoal = require('./models/macroGoal')
 const userFoodModel = require('./models/userFoodModel')
 const trackingModel = require('./models/trackingModel')
 const verifyToken = require('./verifyToken')
 const weightModel = require('./models/weightModel');
-const refreshTokenModel = require('./models/refreshTokenModel'); 
+const refreshTokenModel = require('./models/refreshTokenModel');  
 
 // database connection
 mongoose.connect(process.env.MONGO_URI)
@@ -1143,6 +1144,105 @@ if (process.env.NODE_ENV === 'production') {
     res.send('API running');
   });
 }
+
+/////////////////////////// GOALS ///////////////////////////
+
+///////// MACRO-GOALS /////////
+
+app.post(
+  "/macro-goals",
+  verifyToken,
+  [
+    body("goalProtein")
+      .trim()
+      .isInt({ min: 0 }).withMessage("Protein must be a positive integer")
+      .custom(value => {
+        if (value.toString().length > 5) {
+          throw new Error("Protein value can have at most 5 digits");
+        }
+        return true;
+      }),
+
+    body("goalCarbohydrate")
+      .trim()
+      .isInt({ min: 0 }).withMessage("Carbohydrate must be a positive integer")
+      .custom(value => {
+        if (value.toString().length > 5) {
+          throw new Error("Carbohydrate value can have at most 5 digits");
+        }
+        return true;
+      }),
+
+    body("goalFat")
+      .trim()
+      .isInt({ min: 0 }).withMessage("Fat must be a positive integer")
+      .custom(value => {
+        if (value.toString().length > 5) {
+          throw new Error("Fat value can have at most 5 digits");
+        }
+        return true;
+      }),
+
+    body("goalFiber")
+      .trim()
+      .isInt({ min: 0 }).withMessage("Fiber must be a positive integer")
+      .custom(value => {
+        if (value.toString().length > 5) {
+          throw new Error("Fiber value can have at most 5 digits");
+        }
+        return true;
+      })
+  ],
+  async (req, res) => {
+    console.log("POST /macro-goals called with:", req.body);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const macroGoals = {
+      goalProtein: req.body.goalProtein,
+      goalCarbohydrate: req.body.goalCarbohydrate,
+      goalFat: req.body.goalFat,
+      goalFiber: req.body.goalFiber,
+      userId: req.userId // From verifyToken middleware
+    };
+
+    try {
+      const existing = await macroGoal.findOne({ userId: req.userId });
+      if (existing) {
+        // If exists, update
+        await macroGoal.updateOne({ userId: req.userId }, macroGoals);
+        return res.status(200).json({ message: "Macro goals updated successfully" });
+      }
+
+      await macroGoal.create(macroGoals);
+      return res.status(201).json({ message: "Macro goals saved successfully" });
+    } catch (err) {
+      console.error("Error saving macro goals:", err);
+      return res.status(500).json({ message: "Error saving macro goals" });
+    }
+  }
+);
+
+app.get("/macro-goals", verifyToken, async (req, res) => {
+  console.log("GET /macro-goals hit");
+  try {
+    const userId = req.userId; // populated from the token by verifyToken middleware
+
+    const goals = await macroGoal.findOne({ userId });
+
+    if (!goals) {
+      return res.status(404).json({ message: "No macro goals found" });
+    }
+
+    return res.status(200).json(goals);
+  } catch (error) {
+    console.error("Error fetching macro goals:", error);
+    return res.status(500).json({ message: "Server error fetching macro goals" });
+  }
+});
 
 app.listen(process.env.PORT || PORT, () => {
     console.log('Server is running !!!')

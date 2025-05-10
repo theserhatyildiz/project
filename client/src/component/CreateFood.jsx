@@ -74,7 +74,7 @@ export default function CreateFood() {
     })
     .then((response) => {
       if (response.status === 201) {
-          setMessage({ type: "success", text: "Yiyecek oluşturuldu!" });
+          setMessage({ type: "success-createFood", text: "Yiyecek oluşturuldu!" });
           
       } else {
           setMessage({ type: "error", text: "Bir hata oluştu!" });

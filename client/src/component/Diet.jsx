@@ -22,6 +22,7 @@ export default function Diet() {
     const [loading, setLoading] = useState(true); // Initial loading state set to true
     const [color] = useState("#d73750"); // Color state for ClipLoader
     const [csrfToken, setCsrfToken] = useState(""); // State to store CSRF token
+    const [macroGoals, setMacroGoals] = useState({});
 
     // console.log("Diet items:", { items });
     
@@ -44,6 +45,31 @@ export default function Diet() {
 
         fetchCsrfToken();
     }, []);
+
+     // Fetch saved macro goals on mount
+  useEffect(() => {
+    async function fetchMacroGoals() {
+      try {
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+          headers: {
+            "Authorization": `Bearer ${loggedUser.token}`,
+            "CSRF-Token": csrfToken // Include CSRF token in headers
+          },
+          credentials: 'include'
+        });
+        if (!response.ok) throw new Error("Failed to fetch macro goals");
+
+        const data = await response.json();
+        setMacroGoals(data);
+      } catch (error) {
+        console.error("Error fetching macro goals:", error);
+      }
+    }
+
+    if (loggedUser?.token) {
+      fetchMacroGoals();
+    }
+  }, [loggedUser]);
 
     // ------------------Functions------------------
 
@@ -237,20 +263,32 @@ export default function Diet() {
                                         <div className="totals">
                                             <p className="n-title">Pro</p>
                                             <p className="n-value">{total.totalProtein}g</p>
+                                            <div className="macroGoals-digits"><p> {macroGoals.goalProtein || 0}g</p></div>
                                         </div>
                                         <div className="totals">
                                             <p className="n-title">Karb</p>
                                             <p className="n-value">{total.totalCarbs}g</p>
+                                            <div className="macroGoals-digits"><p> {macroGoals.goalCarbohydrate || 0}g</p></div>
                                         </div>
                                         <div className="totals">
                                             <p className="n-title">Yağ</p>
                                             <p className="n-value">{total.totalFats}g</p>
+                                            <div className="macroGoals-digits"><p> {macroGoals.goalFat || 0}g</p></div>
                                         </div>
                                         <div className="totals">
                                             <p className="n-title">Lif</p>
                                             <p className="n-value">{total.totalFiber}g</p>
+                                            <div className="macroGoals-digits"><p> {macroGoals.goalFiber || 0}g</p></div>
                                         </div>
                                     </div>
+
+                                    {/* <div className="totals-row">
+                                        <div className="macroGoals-digits"><p> {macroGoals.goalProtein || 0}g</p></div>
+                                        <div className="macroGoals-digits"><p> {macroGoals.goalCarbohydrate || 0}g</p></div>
+                                        <div className="macroGoals-digits"><p> {macroGoals.goalFat || 0}g</p></div>
+                                        <div className="macroGoals-digits"><p> {macroGoals.goalFiber || 0}g</p></div>
+                                     </div> */}
+
                                 </div>
                             </div>
                         </div>

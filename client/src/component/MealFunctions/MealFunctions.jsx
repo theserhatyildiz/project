@@ -55,6 +55,7 @@ export default function MealFunctions() {
         // For other days, return the short form of the weekday in Turkish
         return `${weekday}:`;
     }
+    
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);

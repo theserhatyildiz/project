@@ -27,6 +27,11 @@ export default function More() {
                         <span><Link to="/account">&gt;</Link></span>
                         </div>
 
+                          <div className="list-items">  
+                        <li><Link to="/goals">Hedefler</Link></li>
+                        <span><Link to="/goals">&gt;</Link></span>
+                        </div>
+
                         {/* <div className="list-items">  
                         <li><Link to="/profile">Profil</Link></li>
                         <span><Link to="/profile">&gt;</Link></span>
