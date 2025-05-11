@@ -1267,12 +1267,22 @@ border: 3px solid rgb(249, 106, 128);
 
 /* macrogoals page css */
 
+.spinner-container-macrogoals{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%; 
+}
+
 .macrogoals-container{
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-
 }
+
+
 
 .macrogoals-list .list-headings {
     display: flex;

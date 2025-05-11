@@ -30,7 +30,7 @@ export default function Diet() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 console.log('CSRF Token fetched:', csrfToken);
                 if (csrfToken) {
@@ -50,7 +50,7 @@ export default function Diet() {
   useEffect(() => {
     async function fetchMacroGoals() {
       try {
-        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+        const response = await fetch("http://localhost:8000/macro-goals", {
           headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
             "CSRF-Token": csrfToken // Include CSRF token in headers
@@ -74,11 +74,13 @@ export default function Diet() {
     // ------------------Functions------------------
 
     useEffect(() => {
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        setLoading(true); // Show the spinner immediately when fetching starts
+
+        fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
-                "CSRF-Token": csrfToken // Include CSRF token in headers
+                "CSRF-Token": csrfToken
             },
             credentials: 'include'
         })
@@ -86,17 +88,19 @@ export default function Diet() {
         .then((data) => {
             console.log("from diet.jsx:", data);
             if (Array.isArray(data)) {
-                setItems(data); // Ensure the data is an array
+                setItems(data);
             } else {
-                setItems([]); // Set to empty array if data is not an array
+                setItems([]);
             }
-            setLoading(false); // Set loading to false after data is fetched
         })
         .catch((err) => {
-            console.log(err);
-            setItems([]); // Set to empty array if there's an error
-            setLoading(false); // Set loading to false even if there is an error
+            console.error(err);
+            setItems([]);
+        })
+        .finally(() => {
+            setLoading(false); // Spinner always stops after request is done
         });
+
     }, [loggedUser, currentDateView, csrfToken]);
 
     useEffect(() => {
@@ -117,7 +121,7 @@ export default function Diet() {
     };
 
     function deleteFood(itemId) {
-        return fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${itemId}`, {
+        return fetch(`http://localhost:8000/track/${itemId}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,

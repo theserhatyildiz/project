@@ -6,7 +6,8 @@ import ClipLoader from "react-spinners/ClipLoader";
 export default function MacroGoals() {
   const { loggedUser } = useContext(UserContext);
   const [macroGoals, setMacroGoals] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [color] = useState("#d73750"); // Color state for ClipLoader
   const [message, setMessage] = useState({ type: "", text: "" });
   const [csrfToken, setCsrfToken] = useState("");
 
@@ -15,7 +16,7 @@ export default function MacroGoals() {
     async function fetchCsrfToken() {
       console.log('Fetching CSRF token...');
       try {
-        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+        const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
         const { csrfToken } = await response.json();
         console.log('CSRF Token fetched:', csrfToken);
         if (csrfToken) {
@@ -33,28 +34,34 @@ export default function MacroGoals() {
 
   // Fetch saved macro goals on mount
   useEffect(() => {
-    async function fetchMacroGoals() {
-      try {
-        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+  async function fetchMacroGoals() {
+    try {
+      const [response] = await Promise.all([
+        fetch("http://localhost:8000/macro-goals", {
           headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
-            "CSRF-Token": csrfToken // Include CSRF token in headers
+            "CSRF-Token": csrfToken
           },
           credentials: 'include'
-        });
-        if (!response.ok) throw new Error("Failed to fetch macro goals");
+        }),
+        new Promise(res => setTimeout(res, 300)) // minimum 500ms spinner
+      ]);
 
-        const data = await response.json();
-        setMacroGoals(data);
-      } catch (error) {
-        console.error("Error fetching macro goals:", error);
-      }
-    }
+      if (!response.ok) throw new Error("Failed to fetch macro goals");
 
-    if (loggedUser?.token) {
-      fetchMacroGoals();
+      const data = await response.json();
+      setMacroGoals(data);
+    } catch (error) {
+      console.error("Error fetching macro goals:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [loggedUser]);
+  }
+
+  if (loggedUser?.token && csrfToken) {
+    fetchMacroGoals();
+  }
+}, [loggedUser, csrfToken]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,7 +76,7 @@ export default function MacroGoals() {
     try {
       localStorage.setItem('macroGoals', JSON.stringify(macroGoals));
 
-      const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+      const response = await fetch("http://localhost:8000/macro-goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,50 +109,57 @@ export default function MacroGoals() {
   ];
 
   return (
-    <section className="container macrogoals-container">
-      <div className="macrogoals-list">
-        <ul className="list-settings">
-          <div className="list-headings">
-            <div><span>Makro Hedefleri Girin</span></div>
-            <div className="macro-calories">
-              <span>
-              {
-              macroGoals?.goalProtein && macroGoals?.goalCarbohydrate && macroGoals?.goalFat
-                ? (
-                    Number(macroGoals.goalProtein) * 4 +
-                    Number(macroGoals.goalCarbohydrate) * 4 +
-                    Number(macroGoals.goalFat) * 9
-                  )
-                : 0
-            }
+  <section className="container macrogoals-container">
+    {loading ? (
+      <div className="spinner-container-macrogoals">
+        <ClipLoader
+          color={color}
+          loading={loading}
+          size={25}
+          aria-label="Loading Spinner"
+          data-testid="loader"
+        />
+      </div>
+    ) : (
+      <>
+        <div className="macrogoals-list">
+          <ul className="list-settings">
+            <div className="list-headings">
+              <div><span>Makro Hedefleri Girin</span></div>
+              <div className="macro-calories">
+                <span>
+                  {macroGoals?.goalProtein && macroGoals?.goalCarbohydrate && macroGoals?.goalFat
+                    ? (
+                        Number(macroGoals.goalProtein) * 4 +
+                        Number(macroGoals.goalCarbohydrate) * 4 +
+                        Number(macroGoals.goalFat) * 9
+                      )
+                    : 0}
                 </span>
-                
-                <span> kcal</span> {/* Optional: calculate dynamically */}
-            </div>
-          </div>
-
-          {inputs.map(({ label, name, placeholder }) => (
-            <div className="list-items" key={name}>
-              <li>{label}</li>
-              <div className="macro-input">
-                <input
-                  type="text"
-                  name={name}
-                  value={macroGoals[name] || ''}
-                  placeholder={placeholder}
-                  onChange={handleChange}
-                  inputMode="numeric"
-                />
-                <span>g</span>
+                <span> kcal</span>
               </div>
             </div>
-          ))}
-        </ul>
 
-       
-      </div>
+            {inputs.map(({ label, name, placeholder }) => (
+              <div className="list-items" key={name}>
+                <li>{label}</li>
+                <div className="macro-input">
+                  <input
+                    type="text"
+                    name={name}
+                    value={macroGoals[name] || ''}
+                    placeholder={placeholder}
+                    onChange={handleChange}
+                    inputMode="numeric"
+                  />
+                  <span>g</span>
+                </div>
+              </div>
+            ))}
+          </ul>
+        </div>
 
-      <div className="macro-btn">
+        <div className="macro-btn">
           <button onClick={handleSubmit}>Kaydet</button>
         </div>
 
@@ -155,18 +169,9 @@ export default function MacroGoals() {
           </div>
         )}
 
-      {/* Display the saved macro goals in the required format */}
-      {/* {macroGoals && (
-        <p className="macro-summary">
-          Hedef Makrolar: 
-          {macroGoals.goalProtein ? ` ${macroGoals.goalProtein}p,` : ""}
-          {macroGoals.goalCarbohydrate ? ` ${macroGoals.goalCarbohydrate}k,` : ""}
-          {macroGoals.goalFat ? ` ${macroGoals.goalFat}f,` : ""}
-          {macroGoals.goalFiber ? ` ${macroGoals.goalFiber}lif` : ""}
-        </p>
-      )} */}
-
-      <Footer />
-    </section>
-  );
+        <Footer />
+      </>
+    )}
+  </section>
+);
 }
