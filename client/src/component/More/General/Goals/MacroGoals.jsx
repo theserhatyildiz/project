@@ -16,7 +16,7 @@ export default function MacroGoals() {
     async function fetchCsrfToken() {
       console.log('Fetching CSRF token...');
       try {
-        const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
         const { csrfToken } = await response.json();
         console.log('CSRF Token fetched:', csrfToken);
         if (csrfToken) {
@@ -37,7 +37,7 @@ export default function MacroGoals() {
   async function fetchMacroGoals() {
     try {
       const [response] = await Promise.all([
-        fetch("http://localhost:8000/macro-goals", {
+        fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
           headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
             "CSRF-Token": csrfToken
@@ -76,7 +76,7 @@ export default function MacroGoals() {
     try {
       localStorage.setItem('macroGoals', JSON.stringify(macroGoals));
 
-      const response = await fetch("http://localhost:8000/macro-goals", {
+      const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

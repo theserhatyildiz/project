@@ -30,7 +30,7 @@ export default function Diet() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 console.log('CSRF Token fetched:', csrfToken);
                 if (csrfToken) {
@@ -50,7 +50,7 @@ export default function Diet() {
   useEffect(() => {
     async function fetchMacroGoals() {
       try {
-        const response = await fetch("http://localhost:8000/macro-goals", {
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
           headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
             "CSRF-Token": csrfToken // Include CSRF token in headers
@@ -76,7 +76,7 @@ export default function Diet() {
     useEffect(() => {
         setLoading(true); // Show the spinner immediately when fetching starts
 
-        fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
@@ -121,7 +121,7 @@ export default function Diet() {
     };
 
     function deleteFood(itemId) {
-        return fetch(`http://localhost:8000/track/${itemId}`, {
+        return fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${itemId}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
