@@ -74,7 +74,7 @@ export default function Diet() {
         // ------------------Functions------------------
 
         useEffect(() => {
-        fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${loggedUser.token}`,
