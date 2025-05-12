@@ -48,35 +48,35 @@ export default function Diet() {
 
      // Fetch saved macro goals on mount
   useEffect(() => {
-    async function fetchMacroGoals() {
-      try {
-        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
-          headers: {
-            "Authorization": `Bearer ${loggedUser.token}`,
-            "CSRF-Token": csrfToken // Include CSRF token in headers
-          },
-          credentials: 'include'
-        });
-        if (!response.ok) throw new Error("Failed to fetch macro goals");
+        async function fetchMacroGoals() {
+        try {
+            const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+            headers: {
+                "Authorization": `Bearer ${loggedUser.token}`,
+                "CSRF-Token": csrfToken // Include CSRF token in headers
+            },
+            credentials: 'include'
+            });
+            if (!response.ok) throw new Error("Failed to fetch macro goals");
 
-        const data = await response.json();
-        setMacroGoals(data);
-      } catch (error) {
-        console.error("Error fetching macro goals:", error);
-      }
-    }
+            const data = await response.json();
+            setMacroGoals(data);
+        } catch (error) {
+            console.error("Error fetching macro goals:", error);
+        }
+        }
 
-    if (loggedUser?.token) {
-      fetchMacroGoals();
-    }
-  }, [loggedUser]);
+        if (loggedUser?.token) {
+        fetchMacroGoals();
+        }
+    }, [loggedUser]);
 
-    // ------------------Functions------------------
+        // ------------------Functions------------------
 
-    useEffect(() => {
-        setLoading(true); // Show the spinner immediately when fetching starts
+        useEffect(() => {
+        setLoading(true); // Show the spinner immediately
 
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        const fetchData = fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${loggedUser.token}`,
@@ -96,9 +96,12 @@ export default function Diet() {
         .catch((err) => {
             console.error(err);
             setItems([]);
-        })
-        .finally(() => {
-            setLoading(false); // Spinner always stops after request is done
+        });
+
+        const delay = new Promise(res => setTimeout(res, 500)); // ensure spinner stays 500ms
+
+        Promise.all([fetchData, delay]).finally(() => {
+            setLoading(false);
         });
 
     }, [loggedUser, currentDateView, csrfToken]);
