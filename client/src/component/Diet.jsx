@@ -74,37 +74,34 @@ export default function Diet() {
         // ------------------Functions------------------
 
         useEffect(() => {
-        setLoading(true); // Show the spinner immediately
-
-        const fetchData = fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${loggedUser.token}`,
-                "CSRF-Token": csrfToken
-            },
-            credentials: 'include'
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("from diet.jsx:", data);
-            if (Array.isArray(data)) {
-                setItems(data);
-            } else {
-                setItems([]);
-            }
-        })
-        .catch((err) => {
-            console.error(err);
+    fetch(`http://localhost:8000/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${loggedUser.token}`,
+            "CSRF-Token": csrfToken
+        },
+        credentials: 'include'
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        const delay = new Promise(res => setTimeout(res, 500));
+        return Promise.all([data, delay]); // Combine data with 500ms delay
+    })
+    .then(([data]) => {
+        console.log("from diet.jsx:", data);
+        if (Array.isArray(data)) {
+            setItems(data);
+        } else {
             setItems([]);
-        });
-
-        const delay = new Promise(res => setTimeout(res, 500)); // ensure spinner stays 500ms
-
-        Promise.all([fetchData, delay]).finally(() => {
-            setLoading(false);
-        });
-
-    }, [loggedUser, currentDateView, csrfToken]);
+        }
+        setLoading(false); // Only after both fetch and delay complete
+    })
+    .catch((err) => {
+        console.log(err);
+        setItems([]);
+        setLoading(false);
+    });
+}, [loggedUser, currentDateView, csrfToken]);
 
     useEffect(() => {
         if (Array.isArray(items)) {
