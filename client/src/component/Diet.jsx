@@ -290,95 +290,94 @@ export default function Diet() {
   };
 
   // ------------------ Render ------------------
-  return (
-    <>
-      <section className="container diet-container">
-        {loading ? (
-          <div className="spinner-container">
-            <ClipLoader color={color} loading={loading} size={25} />
-          </div>
-        ) : (
-          <>
-            <Header />
+ return (
+  <>
+    <Header />
 
-            <div className="fixed-header">
-              {/* Date controls */}
-              <div className="day-date">
-                <button onClick={() => changeDate(-1)}>{"<"}</button>
-                {relativeDay && <p>{relativeDay}: </p>}
-                <input
-                  className="date-box"
-                  type="date"
-                  value={currentDateView.toISOString().slice(0, 10)}
-                  onChange={(event) => setCurrentDateView(new Date(event.target.value))}
-                />
-                <button onClick={() => changeDate(1)}>{">"}</button>
-              </div>
+    <section className="diet-page-wrapper">
+      {loading ? (
+        <div className="spinner-container">
+          <ClipLoader color={color} loading={loading} size={25} />
+        </div>
+      ) : (
+        <>
+          {/* Fixed Header */}
+          <div className="fixed-header">
+            <div className="day-date">
+              <button onClick={() => changeDate(-1)}>{"<"}</button>
+              {relativeDay && <p>{relativeDay}: </p>}
+              <input
+                className="date-box"
+                type="date"
+                value={currentDateView.toISOString().slice(0, 10)}
+                onChange={(event) => setCurrentDateView(new Date(event.target.value))}
+              />
+              <button onClick={() => changeDate(1)}>{">"}</button>
+            </div>
 
-              {/* Totals + MacroGoals (coach overrides silently) */}
-              <div className="totals-container">
-                <div className="total-macros">
-                  <div>
-                    <h3>Total Kalori: {total.totalCalories} kcal</h3>
+            <div className="totals-container">
+              <div className="total-macros">
+                <div>
+                  <h3>Total Kalori: {total.totalCalories} kcal</h3>
+                </div>
+
+                <div className="totals-row">
+                  <div className="totals">
+                    <p className="n-title">Pro</p>
+                    <p className="n-value">{total.totalProtein}g</p>
+                    <div className="macroGoals-digits">
+                      <p>{macroGoals.goalProtein ?? 0}g</p>
+                    </div>
                   </div>
 
-                  <div className="totals-row">
-                    <div className="totals">
-                      <p className="n-title">Pro</p>
-                      <p className="n-value">{total.totalProtein}g</p>
-                      <div className="macroGoals-digits">
-                        <p>{macroGoals.goalProtein ?? 0}g</p>
-                      </div>
+                  <div className="totals">
+                    <p className="n-title">Karb</p>
+                    <p className="n-value">{total.totalCarbs}g</p>
+                    <div className="macroGoals-digits">
+                      <p>{macroGoals.goalCarbohydrate ?? 0}g</p>
                     </div>
+                  </div>
 
-                    <div className="totals">
-                      <p className="n-title">Karb</p>
-                      <p className="n-value">{total.totalCarbs}g</p>
-                      <div className="macroGoals-digits">
-                        <p>{macroGoals.goalCarbohydrate ?? 0}g</p>
-                      </div>
+                  <div className="totals">
+                    <p className="n-title">Yağ</p>
+                    <p className="n-value">{total.totalFats}g</p>
+                    <div className="macroGoals-digits">
+                      <p>{macroGoals.goalFat ?? 0}g</p>
                     </div>
+                  </div>
 
-                    <div className="totals">
-                      <p className="n-title">Yağ</p>
-                      <p className="n-value">{total.totalFats}g</p>
-                      <div className="macroGoals-digits">
-                        <p>{macroGoals.goalFat ?? 0}g</p>
-                      </div>
-                    </div>
-
-                    <div className="totals">
-                      <p className="n-title">Lif</p>
-                      <p className="n-value">{total.totalFiber}g</p>
-                      <div className="macroGoals-digits">
-                        <p>{macroGoals.goalFiber ?? 0}g</p>
-                      </div>
+                  <div className="totals">
+                    <p className="n-title">Lif</p>
+                    <p className="n-value">{total.totalFiber}g</p>
+                    <div className="macroGoals-digits">
+                      <p>{macroGoals.goalFiber ?? 0}g</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Meals */}
-            <div className="scrollable-content">
-              {meals.map((meal) => {
-                const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
-                return (
-                  <Meal
-                    key={meal.number}
-                    items={mealItems.filter((item) => item.mealNumber === meal.number)}
-                    mealNumber={meal.number}
-                    deleteFood={handleDeleteFood}
-                    eatenDate={eatenDate}
-                  />
-                );
-              })}
-            </div>
-          </>
-        )}
-      </section>
+          {/* Scrollable meals area */}
+          <div className="scrollable-content">
+            {meals.map((meal) => {
+              const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
+              return (
+                <Meal
+                  key={meal.number}
+                  items={mealItems.filter((item) => item.mealNumber === meal.number)}
+                  mealNumber={meal.number}
+                  deleteFood={handleDeleteFood}
+                  eatenDate={eatenDate}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
+    </section>
 
-      <Footer />
-    </>
-  );
+    <Footer />
+  </>
+);
 }
