@@ -326,6 +326,17 @@ export default function TrackWeight() {
                 setPreviousWeeklyAverage(0); // If no entries from days 8 to 14, set average to 0
             }
         };
+
+                useEffect(() => {
+        if (
+            weeklyAverage !== null &&
+            previousWeeklyAverage !== null &&
+            csrfToken &&
+            loggedData?.loggedUser?.userid
+        ) {
+            sendWeightAverages();
+        }
+        }, [weeklyAverage, previousWeeklyAverage, csrfToken, loggedData]);
         
     
         ////// WeeklyAverageChange = Haftalik Degisim //////
@@ -505,6 +516,30 @@ const handleDeleteStartDate = () => {
     .catch(error => {
         console.error("Error deleting start date:", error);
     });
+};
+
+const sendWeightAverages = async () => {
+  try {
+    const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/weights/averages", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${loggedData.loggedUser.token}`,
+        "Content-Type": "application/json",
+        "CSRF-Token": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        userId: loggedData.loggedUser.userid,
+        weeklyAverage: parseFloat(weeklyAverage),
+        previousWeeklyAverage: parseFloat(previousWeeklyAverage),
+      }),
+    });
+
+    const result = await response.json();
+    console.log("✅ Weight averages saved:", result);
+  } catch (error) {
+    console.error("💥 Error saving weight averages:", error);
+  }
 };
 
 return (
