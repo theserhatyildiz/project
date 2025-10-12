@@ -485,7 +485,7 @@ a {
 /* Scrollable content starts after fixed header */
 .scrollable-content {
   flex: 1;
-  margin-top: 15rem; /* Adjust to match your fixed-header's height */
+  margin-top: 11rem; /* Adjust to match your fixed-header's height */
   overflow-y: auto;
   padding-bottom: 5.5rem; /* To prevent footer overlap */
   padding-left: 1rem;
