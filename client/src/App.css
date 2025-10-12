@@ -475,6 +475,7 @@ a {
   background-color: white;
   z-index: 1000;
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: 2rem;
   padding-right: 2rem;
   display: flex;
@@ -485,7 +486,7 @@ a {
 /* Scrollable content starts after fixed header */
 .scrollable-content {
   flex: 1;
-  margin-top: 12rem; /* Adjust to match your fixed-header's height */
+  margin-top: 10rem; /* Adjust to match your fixed-header's height */
   overflow-y: auto;
   padding-bottom: 5.5rem; /* To prevent footer overlap */
   padding-left: 1rem;
