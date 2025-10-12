@@ -466,7 +466,7 @@ a {
     width: 100%;
     background-color: white; /* Adjust as needed */
     z-index: 1000;
-    padding: env(safe-area-inset-top, 0px);
+    padding-top: env(safe-area-inset-top, 0px);
     padding-left: 2rem;
     padding-right: 2rem;
     display: flex;
@@ -498,7 +498,7 @@ a {
     background-color:white; 
     width: 100%;
     margin-bottom: 4.5rem; /* adjustment for the gap between footer*/
-    margin-top: 1rem;
+    margin-top: 2.2rem;
 }
 
 .fixed-header .day-date{
