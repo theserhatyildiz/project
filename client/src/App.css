@@ -1532,6 +1532,9 @@ label input{
 .checkinhistory-container {
   display: flex;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: 1rem;
+  padding-right: 1rem;
   max-height: calc(100vh - 80px); /* ← ADJUST THIS VALUE based on actual header + macro box + button + margins */
 }
 
@@ -1599,6 +1602,9 @@ label input{
 .checkinreport-container{
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .report-date{
@@ -1803,6 +1809,9 @@ label input{
 .more-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .more-list-heading-group{
@@ -1849,6 +1858,9 @@ label input{
 .account-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -1949,6 +1961,9 @@ border: 3px solid rgb(249, 106, 128);
 .goals-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -1973,6 +1988,9 @@ border: 3px solid rgb(249, 106, 128);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 
@@ -2043,6 +2061,9 @@ border: 3px solid rgb(249, 106, 128);
 .about-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -2226,6 +2247,9 @@ button.btn-primary:hover {
   align-items: center;
   gap: 1rem;
   text-align: center;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .fat-slider-image img {
