@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import Header from './Header';
 import Footer from "./Footer";
 import { UserContext } from "../context/UserContext";
@@ -138,6 +138,11 @@ export default function SearchFood() {
         <section className="container search-container">
             <Header />
             <Footer />
+            <div className="create-food-button">
+                <Link to="/createfood">
+                    <button>Yiyecek Oluştur</button>
+                </Link>
+            </div>
             <div className="search">
                 <input className="search-inp" type="search" onChange={handleInputChange} maxLength={50} placeholder="Yiyecek Arayın" />
                 {loading ? (
