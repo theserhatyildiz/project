@@ -487,7 +487,7 @@ a {
   flex: 1;
   margin-top: 10rem; /* Adjust to match your fixed-header's height */
   overflow-y: auto;
-  padding-bottom: 5.5rem; /* To prevent footer overlap */
+  padding-bottom: 7rem; /* To prevent footer overlap */
   padding-left: 1rem;
   padding-right: 1rem;
   scrollbar-width: none; /* Firefox */
