@@ -14,8 +14,9 @@ html::-webkit-scrollbar {
     width:100%;
     background-color: white;
     color: black;
-    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom,
-            0px) env(safe-area-inset-left, 0px);
+    padding: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
     display: flex;
     align-items: center;
 }
