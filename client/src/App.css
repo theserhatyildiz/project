@@ -14,9 +14,7 @@ html::-webkit-scrollbar {
     width:100%;
     background-color: white;
     color: black;
-    padding: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 1rem 1rem;
     display: flex;
     align-items: center;
 }
@@ -148,6 +146,7 @@ a {
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: env(safe-area-inset-top, 0px);
 }
 
 .average-nutrition{
