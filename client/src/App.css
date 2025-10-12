@@ -242,7 +242,7 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
-    height: 100lvh;
+    height: 100dvh;
 }
 
 .create-food-button {
