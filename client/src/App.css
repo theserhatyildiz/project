@@ -147,6 +147,8 @@ a {
     flex-direction: column;
     width: 100%;
     padding: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .average-nutrition{
