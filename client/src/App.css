@@ -475,7 +475,6 @@ a {
   background-color: white;
   z-index: 1000;
   padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: 2rem;
   padding-right: 2rem;
   display: flex;
