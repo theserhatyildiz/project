@@ -245,6 +245,9 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
+    padding: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .create-food-button {
