@@ -8,6 +8,7 @@ import Private from './component/Private'
 import SearchFood from './component/SearchFood'
 import FoodData from './component/FoodData'
 import Demo from './component/Demo'
+import Dashboard from './component/Dashboard/Dashboard'
 import CreateFood from './component/CreateFood'
 import TrackWeight from './component/TrackWeight'
 import MealFunctions from './component/MealFunctions/MealFunctions'
@@ -20,10 +21,17 @@ import Goals from './component/More/General/Goals/Goals'
 import MacroGoals from './component/More/General/Goals/MacroGoals'
 import Profile from './component/More/General/Profile'
 import About from './component/More/HelpInfo/About'
+import MacroCoachForm from './component/MacroCoach/MacroCoachForm'
+import MacroCoach from './component/MacroCoach/MacroCoach'
+import CheckIn from './component/MacroCoach/CheckIn'
+import CheckInHistory from './component/MacroCoach/CheckInHistory'
+import CheckInReport from './component/MacroCoach/CheckInReport'
+
 
 import { UserContext } from './context/UserContext'
 import { useEffect, useState } from 'react'
 import { useAuth } from './component/UseAuth'; // Correctly import the hook
+
 
 function App() {
     // Use useAuth hook to manage the auth logic
@@ -48,6 +56,9 @@ function App() {
                     <Route path='/register' element={<Register />} />
                     <Route path='/verify/:id/:token' element={<VerifyEmail />} />
 
+                    {/* Dashboard */}
+                     <Route path='/dashboard' element={<Private Component={Dashboard} />} />
+
                     {/* Diet & Weight Tracking */}
                     <Route path='/diet' element={<Private Component={Diet} />} />
                     <Route path='/search' element={<Private Component={SearchFood} />} />
@@ -56,6 +67,13 @@ function App() {
                     <Route path='/weight' element={<Private Component={TrackWeight} />} />
                     
                     <Route path='/mealfunctions' element={<Private Component={MealFunctions} />} />
+
+                    {/* MacroCoach */}
+                    <Route path='/macrocoachform' element={<Private Component={MacroCoachForm} />} />
+                    <Route path='/macrocoach' element={<Private Component={MacroCoach} />} />
+                    <Route path='/checkin' element={<Private Component={CheckIn} />} />
+                    <Route path='/checkinhistory' element={<Private Component={CheckInHistory} />} />
+                    <Route path='/checkinreport/:id' element={<Private Component={CheckInReport} />} />
                     
                     {/* More */}
                     <Route path='/more' element={<Private Component={More} />} />

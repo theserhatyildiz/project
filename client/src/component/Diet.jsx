@@ -1,321 +1,384 @@
-import { UserContext } from "../context/UserContext"; 
+import { UserContext } from "../context/UserContext";
 import { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Header from './Header';
+import Header from "./Header";
 import Footer from "./Footer";
 import Meal from "./Meal";
-import ObjectId from 'bson-objectid';
 import ClipLoader from "react-spinners/ClipLoader";
 
 export default function Diet() {
-    // ------------------Variables------------------
+  // ------------------ Context & State ------------------
+  const { loggedUser, currentDateView, setCurrentDateView } = useContext(UserContext);
 
-    const { loggedUser, currentDateView, setCurrentDateView } = useContext(UserContext);
-    const [items, setItems] = useState([]); // Ensure initial state is an array
-    const [total, setTotal] = useState({
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFats: 0,
-        totalFiber: 0
-    });
-    const [loading, setLoading] = useState(true); // Initial loading state set to true
-    const [color] = useState("#d73750"); // Color state for ClipLoader
-    const [csrfToken, setCsrfToken] = useState(""); // State to store CSRF token
-    const [macroGoals, setMacroGoals] = useState({});
+  const [items, setItems] = useState([]);
+  const [total, setTotal] = useState({
+    totalCalories: 0,
+    totalProtein: 0,
+    totalCarbs: 0,
+    totalFats: 0,
+    totalFiber: 0,
+  });
 
-    // console.log("Diet items:", { items });
-    
+  const [loading, setLoading] = useState(true);
+  const [color] = useState("#d73750");
+  const [csrfToken, setCsrfToken] = useState("");
+  const [macroGoals, setMacroGoals] = useState({
+    goalProtein: 0,
+    goalCarbohydrate: 0,
+    goalFat: 0,
+    goalFiber: 0,
+  });
 
-    useEffect(() => {
-        async function fetchCsrfToken() {
-            try {
-                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
-                const { csrfToken } = await response.json();
-                console.log('CSRF Token fetched:', csrfToken);
-                if (csrfToken) {
-                    setCsrfToken(csrfToken);
-                    document.cookie = `XSRF-TOKEN=${csrfToken}; Secure; SameSite=Strict; path=/`;
-                    console.log('CSRF Token stored in cookie:', csrfToken);
-                }
-            } catch (error) {
-                console.error('Error fetching CSRF token:', error);
-            }
-        }
+  const [dataReady, setDataReady] = useState({
+  csrfToken: false,
+  macroGoals: false,
+  dailyItems: false,
+  });
 
-        fetchCsrfToken();
-    }, []);
-
-     // Fetch saved macro goals on mount
   useEffect(() => {
-        async function fetchMacroGoals() {
-        try {
-            const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
-            headers: {
-                "Authorization": `Bearer ${loggedUser.token}`,
-                "CSRF-Token": csrfToken // Include CSRF token in headers
-            },
-            credentials: 'include'
-            });
-            if (!response.ok) throw new Error("Failed to fetch macro goals");
+  if (dataReady.csrfToken && dataReady.macroGoals && dataReady.dailyItems) {
+    setLoading(false);
+    console.log("✅ All Diet page data fetched — hiding spinner");
+  }
+  }, [dataReady]);
 
-            const data = await response.json();
-            setMacroGoals(data);
-        } catch (error) {
-            console.error("Error fetching macro goals:", error);
+  // ------------------ CSRF Token ------------------
+  useEffect(() => {
+    async function fetchCsrfToken() {
+      try {
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: "include" });
+        const { csrfToken } = await response.json();
+        if (csrfToken) {
+          setCsrfToken(csrfToken);
+          document.cookie = `XSRF-TOKEN=${csrfToken}; Secure; SameSite=Strict; path=/`;
+          setDataReady(prev => ({ ...prev, csrfToken: true }));
         }
-        }
-
-        if (loggedUser?.token) {
-        fetchMacroGoals();
-        }
-    }, [loggedUser]);
-
-        // ------------------Functions------------------
-
-        useEffect(() => {
-        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${loggedUser.token}`,
-            "CSRF-Token": csrfToken
-        },
-        credentials: 'include'
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        const delay = new Promise(res => setTimeout(res, 500));
-        return Promise.all([data, delay]); // Combine data with 500ms delay
-    })
-    .then(([data]) => {
-        console.log("from diet.jsx:", data);
-        if (Array.isArray(data)) {
-            setItems(data);
-        } else {
-            setItems([]);
-        }
-        setLoading(false); // Only after both fetch and delay complete
-    })
-    .catch((err) => {
-        console.log(err);
-        setItems([]);
-        setLoading(false);
-    });
-}, [loggedUser, currentDateView, csrfToken]);
-
-    useEffect(() => {
-        if (Array.isArray(items)) {
-            calculateTotal();
-        }
-    }, [items]);
-
-    const handleDeleteFood = (foodId) => {
-        deleteFood(foodId)
-        .then(() => {
-            setItems(prevItems => prevItems.filter(item => item._id !== foodId));
-            calculateTotal();
-        })
-        .catch(error => {
-            console.error("Error deleting food:", error);
-        });
-    };
-
-    function deleteFood(itemId) {
-        return fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${itemId}`, {
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${loggedUser.token}`,
-                "CSRF-Token": csrfToken // Include CSRF token in headers
-            },
-            credentials: 'include'
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log("Food deleted successfully");
-            } else {
-                throw new Error(`Error deleting food: ${response.statusText}`);
-            }
-        })
-        .catch(error => {
-            console.error("Error deleting food:", error);
-            throw error;
-        });
+      } catch (error) {
+        console.error("Error fetching CSRF token:", error);
+      }
     }
+    fetchCsrfToken();
+  }, []);
 
-    function calculateTotal() {
-        let totalCopy = {
-            totalCalories: 0,
-            totalProtein: 0,
-            totalCarbs: 0,
-            totalFats: 0,
-            totalFiber: 0
-        };
+  // ------------------ Get macro goals (prefer coach) ------------------
+  useEffect(() => {
+    if (!loggedUser?.token || !loggedUser?.userid || !csrfToken) return;
 
-        items.forEach((item) => {
-            totalCopy.totalCalories += item.details.Calorie;
-            totalCopy.totalProtein += item.details.Protein;
-            totalCopy.totalCarbs += item.details.Carbohydrate;
-            totalCopy.totalFats += item.details.Fat;
-            totalCopy.totalFiber += item.details.Fiber;
-        });
+    let cancelled = false;
 
-        totalCopy.totalCalories = parseFloat(totalCopy.totalCalories.toFixed(1));
-        totalCopy.totalProtein = parseFloat(totalCopy.totalProtein.toFixed(1));
-        totalCopy.totalCarbs = parseFloat(totalCopy.totalCarbs.toFixed(1));
-        totalCopy.totalFats = parseFloat(totalCopy.totalFats.toFixed(1));
-        totalCopy.totalFiber = parseFloat(totalCopy.totalFiber.toFixed(1));
+    (async () => {
+      try {
+        const [coachRes, savedRes] = await Promise.allSettled([
+          fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/macrocoach/macros/${loggedUser.userid}`, {
+            headers: { Authorization: `Bearer ${loggedUser.token}` },
+            credentials: "include",
+          }),
+          fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+            headers: {
+              Authorization: `Bearer ${loggedUser.token}`,
+              "CSRF-Token": csrfToken,
+            },
+            credentials: "include",
+          }),
+        ]);
 
-        setTotal(totalCopy);
-    }
+        let nextGoals = { goalProtein: 0, goalCarbohydrate: 0, goalFat: 0, goalFiber: 0 };
 
-    const meals = [
-        { number: 1, title: "1.Öğün" },
-        { number: 2, title: "2.Öğün" },
-        { number: 3, title: "3.Öğün" },
-        { number: 4, title: "4.Öğün" },
-        { number: 5, title: "5.Öğün" },
-        { number: 6, title: "6.Öğün" },
-    ];
-
-    const mealItems = [];
-
-    meals.forEach((meal) => {
-        const mealItemsArray = Array.isArray(items) ? items.filter((item) => item.mealNumber === meal.number) : [];
-        mealItemsArray.forEach((item) => {
-            item.mealNumber = meal.number;
-        });
-        mealItems.push(...mealItemsArray);
-    });
-
-    // Check if the current date is today, yesterday, or tomorrow
-    const getRelativeDay = (date) => {
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-    
-        if (date.getDate() === today.getDate() &&
-            date.getMonth() === today.getMonth() &&
-            date.getFullYear() === today.getFullYear()) {
-            return "bugün";
-        } else if (date.getDate() === yesterday.getDate() &&
-                   date.getMonth() === yesterday.getMonth() &&
-                   date.getFullYear() === yesterday.getFullYear()) {
-            return "dün";
-        } else if (date.getDate() === tomorrow.getDate() &&
-                   date.getMonth() === tomorrow.getMonth() &&
-                   date.getFullYear() === tomorrow.getFullYear()) {
-            return "yarın";
+        // Prefer coach if available
+        if (coachRes.status === "fulfilled" && coachRes.value.ok) {
+          const coach = await coachRes.value.json();
+          nextGoals = {
+            goalProtein: Number(coach?.protein ?? 0),
+            goalCarbohydrate: Number(coach?.carbs ?? 0),
+            goalFat: Number(coach?.fat ?? 0),
+            goalFiber: Number(coach?.fiber ?? 0),
+          };
+          console.log("✅ Using MacroCoach macros:", nextGoals);
+        } else if (savedRes.status === "fulfilled" && savedRes.value.ok) {
+          const saved = await savedRes.value.json();
+          nextGoals = {
+            goalProtein: Number(saved?.goalProtein ?? 0),
+            goalCarbohydrate: Number(saved?.goalCarbohydrate ?? 0),
+            goalFat: Number(saved?.goalFat ?? 0),
+            goalFiber: Number(saved?.goalFiber ?? 0),
+          };
+          console.log("ℹ️ Using saved macro goals:", nextGoals);
         } else {
-            const weekdays = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
-            return weekdays[date.getDay()];
+          console.warn("⚠️ Neither coach nor saved macros available.");
         }
-    };
 
-    const relativeDay = getRelativeDay(currentDateView);
+        if (!cancelled) {
+          setMacroGoals(nextGoals);
+          setDataReady(prev => ({ ...prev, macroGoals: true }));
+        }
+      } catch (e) {
+        console.error("Macro goals fetch error:", e);
+      }
+    })();
 
-    const changeDate = (offset) => {
-        console.log('Current Date View before change:', currentDateView.toISOString());
+    return () => { cancelled = true; };
+  }, [loggedUser, csrfToken]);
 
-        const newDate = new Date(currentDateView);
-        newDate.setDate(newDate.getDate() + offset);
-        setCurrentDateView(newDate);
-    };
+  // ------------------ Fetch Daily Items For Current Date ------------------
+  useEffect(() => {
+    if (!loggedUser?.token || !csrfToken) return;
 
-    useEffect(() => {
-        console.log('Current Date View updated:', currentDateView.toISOString());
-    }, [currentDateView]);
+    let cancelled = false;
 
-    return (
-        <>
-            <section className="container diet-container">
-                {loading ? (
-                    <div className="spinner-container">
-                        <ClipLoader
-                            color={color}
-                            loading={loading}
-                            size={25}
-                            aria-label="Loading Spinner"
-                            data-testid="loader"
-                        />
-                    </div>
-                ) : (
-                    <>
-                        <Header />
-                        <div className="fixed-header">
-                            <div className="day-date">
-                                <button onClick={() => changeDate(-1)}>{"<"}</button>
-                                {relativeDay && <p>{relativeDay}: </p>}
-                                <input 
-                                    className="date-box" 
-                                    type="date" 
-                                    value={currentDateView.toISOString().slice(0, 10)} 
-                                    onChange={(event) => {
-                                        setCurrentDateView(new Date(event.target.value));
-                                    }}
-                                />
-                                <button onClick={() => changeDate(1)}>{">"}</button>
-                            </div>
-                            <div className="totals-container">
-                                <div className="total-macros">
-                                    <div>
-                                        <h3>Total Kalori: {total.totalCalories} kcal</h3>
-                                    </div>
+    (async () => {
+      try {
+        const url = `https://galwinapp1-c1d71c579009.herokuapp.com/track/${loggedUser.userid}/${currentDateView.getMonth() + 1}-${currentDateView.getDate()}-${currentDateView.getFullYear()}`;
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${loggedUser.token}`,
+            "CSRF-Token": csrfToken,
+          },
+          credentials: "include",
+        });
 
-                                    <div className="totals-row">
-                                        <div className="totals">
-                                            <p className="n-title">Pro</p>
-                                            <p className="n-value">{total.totalProtein}g</p>
-                                            <div className="macroGoals-digits"><p> {macroGoals.goalProtein || 0}g</p></div>
-                                        </div>
-                                        <div className="totals">
-                                            <p className="n-title">Karb</p>
-                                            <p className="n-value">{total.totalCarbs}g</p>
-                                            <div className="macroGoals-digits"><p> {macroGoals.goalCarbohydrate || 0}g</p></div>
-                                        </div>
-                                        <div className="totals">
-                                            <p className="n-title">Yağ</p>
-                                            <p className="n-value">{total.totalFats}g</p>
-                                            <div className="macroGoals-digits"><p> {macroGoals.goalFat || 0}g</p></div>
-                                        </div>
-                                        <div className="totals">
-                                            <p className="n-title">Lif</p>
-                                            <p className="n-value">{total.totalFiber}g</p>
-                                            <div className="macroGoals-digits"><p> {macroGoals.goalFiber || 0}g</p></div>
-                                        </div>
-                                    </div>
+        const data = await response.json();
+        await new Promise((res) => setTimeout(res, 200)); // gentle spinner
 
-                                    {/* <div className="totals-row">
-                                        <div className="macroGoals-digits"><p> {macroGoals.goalProtein || 0}g</p></div>
-                                        <div className="macroGoals-digits"><p> {macroGoals.goalCarbohydrate || 0}g</p></div>
-                                        <div className="macroGoals-digits"><p> {macroGoals.goalFat || 0}g</p></div>
-                                        <div className="macroGoals-digits"><p> {macroGoals.goalFiber || 0}g</p></div>
-                                     </div> */}
+        if (!cancelled) {
+        setItems(Array.isArray(data) ? data : []);
 
-                                </div>
-                            </div>
-                        </div>
-                        <div className="scrollable-content">
-                        {meals.map((meal) => {
-                            // Format the date as MM/DD/YYYY
-                            const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
-                            console.log(`Diet Eaten Date: ${eatenDate}`);
-                            return (
-                                <Meal 
-                                    key={meal.number} 
-                                    items={mealItems.filter((item) => item.mealNumber === meal.number)} 
-                                    mealNumber={meal.number} 
-                                    deleteFood={handleDeleteFood}
-                                    eatenDate={eatenDate}
-                                />
-                            );
-                        })}
-                    </div>
-                    </>
-                )}
-            </section>
-            <Footer />
-        </>
+        // ✅ Mark dailyItems as ready only on successful fetch
+        setDataReady(prev => ({ ...prev, dailyItems: true }));
+      }
+    } catch (err) {
+      console.error(err);
+
+      if (!cancelled) {
+        setItems([]); // fallback if error
+        setDataReady(prev => ({ ...prev, dailyItems: true })); // ✅ Also mark as ready on failure
+      }
+    }
+    // ❌ Removed redundant: setLoading(false)
+    })();
+
+      return () => { cancelled = true; };
+    }, [loggedUser, currentDateView, csrfToken]);
+
+  // ------------------ Recalc Totals When Items Change ------------------
+  useEffect(() => {
+    if (Array.isArray(items)) {
+      calculateTotal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  // ------------------ Helpers ------------------
+  function calculateTotal() {
+    const tot = items.reduce(
+      (acc, item) => {
+        acc.totalCalories += item.details.Calorie;
+        acc.totalProtein += item.details.Protein;
+        acc.totalCarbs += item.details.Carbohydrate;
+        acc.totalFats += item.details.Fat;
+        acc.totalFiber += item.details.Fiber;
+        return acc;
+      },
+      { totalCalories: 0, totalProtein: 0, totalCarbs: 0, totalFats: 0, totalFiber: 0 }
     );
+
+    const normalized = {
+      totalCalories: parseFloat(tot.totalCalories.toFixed(1)),
+      totalProtein: parseFloat(tot.totalProtein.toFixed(1)),
+      totalCarbs: parseFloat(tot.totalCarbs.toFixed(1)),
+      totalFats: parseFloat(tot.totalFats.toFixed(1)),
+      totalFiber: parseFloat(tot.totalFiber.toFixed(1)),
+    };
+
+    setTotal(normalized);
+    saveDailyMacros(normalized);
+  }
+
+  async function saveDailyMacros(macroData) {
+    if (!csrfToken) return;
+
+    const formattedDate = currentDateView.toISOString().slice(0, 10);
+
+    try {
+      const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-totals", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${loggedUser.token}`,
+          "CSRF-Token": csrfToken,
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          userId: loggedUser.userid,
+          eatenDate: formattedDate,
+          totalProtein: macroData.totalProtein,
+          totalCarbs: macroData.totalCarbs,
+          totalFats: macroData.totalFats,
+          totalFiber: macroData.totalFiber,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("📬 Backend response:", result);
+      if (!response.ok) throw new Error("Failed to save macro totals");
+    } catch (error) {
+      console.error("Error saving macro totals:", error);
+    }
+  }
+
+  const handleDeleteFood = (foodId) => {
+    deleteFood(foodId)
+      .then(() => {
+        setItems((prev) => prev.filter((item) => item._id !== foodId));
+        calculateTotal();
+      })
+      .catch((error) => {
+        console.error("Error deleting food:", error);
+      });
+  };
+
+  function deleteFood(itemId) {
+    return fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/track/${itemId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${loggedUser.token}`,
+        "CSRF-Token": csrfToken,
+      },
+      credentials: "include",
+    }).then((response) => {
+      if (!response.ok) {
+        throw new Error(`Error deleting food: ${response.statusText}`);
+      }
+    });
+  }
+
+  const meals = [
+    { number: 1, title: "1.Öğün" },
+    { number: 2, title: "2.Öğün" },
+    { number: 3, title: "3.Öğün" },
+    { number: 4, title: "4.Öğün" },
+    { number: 5, title: "5.Öğün" },
+    { number: 6, title: "6.Öğün" },
+  ];
+
+  const mealItems = [];
+  meals.forEach((meal) => {
+    const mealItemsArray = Array.isArray(items) ? items.filter((item) => item.mealNumber === meal.number) : [];
+    mealItemsArray.forEach((item) => { item.mealNumber = meal.number; });
+    mealItems.push(...mealItemsArray);
+  });
+
+  const getRelativeDay = (date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    const tomorrow = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    tomorrow.setDate(today.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) return "bugün";
+    if (date.toDateString() === yesterday.toDateString()) return "dün";
+    if (date.toDateString() === tomorrow.toDateString()) return "yarın";
+    const weekdays = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
+    return weekdays[date.getDay()];
+  };
+
+  const relativeDay = getRelativeDay(currentDateView);
+
+  const changeDate = (offset) => {
+    const newDate = new Date(currentDateView);
+    newDate.setDate(newDate.getDate() + offset);
+    setCurrentDateView(newDate);
+  };
+
+  // ------------------ Render ------------------
+  return (
+    <>
+      <section className="container diet-container">
+        {loading ? (
+          <div className="spinner-container">
+            <ClipLoader color={color} loading={loading} size={25} />
+          </div>
+        ) : (
+          <>
+            <Header />
+
+            <div className="fixed-header">
+              {/* Date controls */}
+              <div className="day-date">
+                <button onClick={() => changeDate(-1)}>{"<"}</button>
+                {relativeDay && <p>{relativeDay}: </p>}
+                <input
+                  className="date-box"
+                  type="date"
+                  value={currentDateView.toISOString().slice(0, 10)}
+                  onChange={(event) => setCurrentDateView(new Date(event.target.value))}
+                />
+                <button onClick={() => changeDate(1)}>{">"}</button>
+              </div>
+
+              {/* Totals + MacroGoals (coach overrides silently) */}
+              <div className="totals-container">
+                <div className="total-macros">
+                  <div>
+                    <h3>Total Kalori: {total.totalCalories} kcal</h3>
+                  </div>
+
+                  <div className="totals-row">
+                    <div className="totals">
+                      <p className="n-title">Pro</p>
+                      <p className="n-value">{total.totalProtein}g</p>
+                      <div className="macroGoals-digits">
+                        <p>{macroGoals.goalProtein ?? 0}g</p>
+                      </div>
+                    </div>
+
+                    <div className="totals">
+                      <p className="n-title">Karb</p>
+                      <p className="n-value">{total.totalCarbs}g</p>
+                      <div className="macroGoals-digits">
+                        <p>{macroGoals.goalCarbohydrate ?? 0}g</p>
+                      </div>
+                    </div>
+
+                    <div className="totals">
+                      <p className="n-title">Yağ</p>
+                      <p className="n-value">{total.totalFats}g</p>
+                      <div className="macroGoals-digits">
+                        <p>{macroGoals.goalFat ?? 0}g</p>
+                      </div>
+                    </div>
+
+                    <div className="totals">
+                      <p className="n-title">Lif</p>
+                      <p className="n-value">{total.totalFiber}g</p>
+                      <div className="macroGoals-digits">
+                        <p>{macroGoals.goalFiber ?? 0}g</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Meals */}
+            <div className="scrollable-content">
+              {meals.map((meal) => {
+                const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
+                return (
+                  <Meal
+                    key={meal.number}
+                    items={mealItems.filter((item) => item.mealNumber === meal.number)}
+                    mealNumber={meal.number}
+                    deleteFood={handleDeleteFood}
+                    eatenDate={eatenDate}
+                  />
+                );
+              })}
+            </div>
+          </>
+        )}
+      </section>
+
+      <Footer />
+    </>
+  );
 }

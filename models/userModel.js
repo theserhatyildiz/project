@@ -17,12 +17,24 @@ const userSchema = mongoose.Schema({
         type: Date,
         default: null // Bu kisi kilo takibi icin yeni bir baslangic tarihi secmede kullaniliyor
     },
+    macroCoachStartedAt: {
+        type: Date, // Bu kisinin makro coach i baslattigi tarih
+    },
+
+    lastCheckInAt: { 
+        type: Date, // Bu kisim checkin leri takip etmek icin
+    },
+
     isVerified: {
         type: Boolean,
         default: false
     },
     emailToken: {
         type: String,
+    },
+    hasSubmittedCoachForm: { 
+        type: Boolean, 
+        default: false 
     }
 },{timestamps:true})
 

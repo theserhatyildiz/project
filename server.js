@@ -14,14 +14,19 @@ require('dotenv').config();
 const crypto = require('crypto');
 const path = require('path');
 
+const macroCoachForm = require('./models/macroCoachForm')
+const dailyMacroTotal = require('./models/dailyMacroTotal')
 const userModel = require('./models/userModel')
 const foodModel =  require('./models/foodModel')
 const macroGoal = require('./models/macroGoal')
+const macroCoachMacro = require('./models/macroCoachMacro')
+const macroCoachWeeklyMacroAverage = require('./models/macroCoachWeeklyMacroAverage') 
 const userFoodModel = require('./models/userFoodModel')
 const trackingModel = require('./models/trackingModel')
 const verifyToken = require('./verifyToken')
+const weightAverage = require('./models/weightAverage')
 const weightModel = require('./models/weightModel');
-const refreshTokenModel = require('./models/refreshTokenModel');  
+const refreshTokenModel = require('./models/refreshTokenModel'); 
 
 // database connection
 mongoose.connect(process.env.MONGO_URI)
@@ -921,6 +926,230 @@ app.post("/track/copy", verifyToken, async (req, res) => {
     }
 });
 
+///////////////////////////////////// DASHBOARD /////////////////////////////////////
+
+app.post('/macro-totals', async (req, res) => {
+    console.log("Incoming POST /macro-totals");
+    console.log("Body:", req.body);
+    console.log("Checking fields - userId:", req.body.userId, "eatenDate:", req.body.eatenDate);
+
+    if (!req.body.userId || !req.body.eatenDate) {
+      console.log("❌ One or more required fields are missing or falsy");
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // 🚫 Check if all macros are zero or undefined/null
+    const { totalProtein, totalCarbs, totalFats, totalFiber } = req.body;
+    const allZero =
+      (!totalProtein || totalProtein === 0) &&
+      (!totalCarbs || totalCarbs === 0) &&
+      (!totalFats || totalFats === 0) &&
+      (!totalFiber || totalFiber === 0);
+
+    if (allZero) {
+      console.log("⛔ Skipping save: all macro values are zero");
+      return res.status(204).send(); // No Content
+    }
+
+    try {
+        const existing = await dailyMacroTotal.findOne({
+            userId: req.body.userId,
+            eatenDate: req.body.eatenDate
+        });
+
+        if (existing) {
+            existing.totalProtein = totalProtein;
+            existing.totalCarbs = totalCarbs;
+            existing.totalFats = totalFats;
+            existing.totalFiber = totalFiber;
+            await existing.save();
+        } else {
+            await dailyMacroTotal.create({
+                userId: req.body.userId,
+                eatenDate: req.body.eatenDate,
+                totalProtein,
+                totalCarbs,
+                totalFats,
+                totalFiber
+            });
+        }
+
+        res.status(200).json({ message: "Macro totals saved successfully" });
+    } catch (error) {
+        console.error("Error saving macro totals:", error);
+        res.status(500).json({ error: "Server error saving macro totals" });
+    }
+});
+//Get Weekly Average Macros with smart 7-day interval logic
+
+app.get('/macro-totals/weekly-average', async (req, res) => {
+  try {
+    const { userId, includeToday, startDate } = req.query;
+
+    console.group("📥 [ROUTE] GET /macro-totals/weekly-average");
+    console.log("➡️ Query received:", { userId, includeToday, startDate });
+
+    if (!userId) {
+      console.log("❌ userId missing in query");
+      console.groupEnd();
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
+    let mongoUserId;
+    try {
+      mongoUserId = new mongoose.Types.ObjectId(userId);
+      console.log("✅ Converted userId to ObjectId:", mongoUserId);
+    } catch (err) {
+      console.error("❌ Invalid userId format:", userId);
+      console.groupEnd();
+      return res.status(400).json({ error: "Invalid userId" });
+    }
+
+    const formatDateString = (date) => date.toISOString().split("T")[0];
+    const today = new Date();
+
+    if (includeToday !== 'true') {
+      today.setDate(today.getDate() - 1);
+      console.log("📅 Excluding today from date range");
+    } else {
+      console.log("📅 Including today in date range");
+    }
+
+    // Use macroCoachStartedAt if available
+    let baseDate = null;
+    if (startDate && startDate !== 'null') {
+      baseDate = new Date(startDate);
+      if (isNaN(baseDate)) {
+        console.warn("⚠️ Invalid startDate, falling back to last 7 days logic");
+        baseDate = null;
+      } else {
+        console.log("📌 Using macroCoachStartedAt:", baseDate.toISOString());
+      }
+    }
+
+    const allDates = [];
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    if (baseDate) {
+      const timePassed = today.getTime() - baseDate.getTime();
+      const dayOffset = Math.floor(timePassed / oneDay);
+      const currentWeek = Math.floor(dayOffset / 7);
+      const weekStart = new Date(baseDate.getTime() + currentWeek * 7 * oneDay);
+
+      const daysSinceWeekStart = Math.min(6, Math.floor((today - weekStart) / oneDay));
+      for (let i = 0; i <= daysSinceWeekStart; i++) {
+        const d = new Date(weekStart.getTime() + i * oneDay);
+        allDates.push(formatDateString(d));
+      }
+
+      console.log(`📅 Calculating for week ${currentWeek + 1} since macro coach start`);
+      console.log("📆 MacroCoach week dates:", allDates);
+
+    } else {
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(today.getTime() - i * oneDay);
+        allDates.push(formatDateString(d));
+      }
+
+      console.log("📅 No start date, using rolling last 7 days:", allDates);
+    }
+
+    // Fetch entries
+    const rawEntries = await dailyMacroTotal.find({
+      userId: mongoUserId,
+      eatenDate: { $in: allDates }
+    }).lean();
+
+    console.log("📄 Raw DB entries found:", rawEntries.length);
+
+    // Organize by date
+    const byDate = {};
+    for (const entry of rawEntries) {
+      byDate[entry.eatenDate] = entry;
+    }
+
+    const paddedEntries = allDates.map((dateStr) => {
+      const entry = byDate[dateStr] || {};
+      return {
+        date: dateStr,
+        totalProtein: entry.totalProtein || 0,
+        totalCarbs: entry.totalCarbs || 0,
+        totalFats: entry.totalFats || 0,
+        totalFiber: entry.totalFiber || 0,
+      };
+    });
+
+    console.log("📊 Final 7-day padded entries:", paddedEntries);
+
+    // Manual average
+    const avg = {
+      avgProtein: 0,
+      avgCarbs: 0,
+      avgFats: 0,
+      avgFiber: 0,
+      entryCount: paddedEntries.length,
+      dateRange: { from: allDates[0], to: allDates[allDates.length - 1] }
+    };
+
+    for (const day of paddedEntries) {
+      avg.avgProtein += day.totalProtein;
+      avg.avgCarbs += day.totalCarbs;
+      avg.avgFats += day.totalFats;
+      avg.avgFiber += day.totalFiber;
+    }
+
+    const divisor = paddedEntries.length || 1;
+
+    avg.avgProtein = Number((avg.avgProtein / divisor).toFixed(1));
+    avg.avgCarbs = Number((avg.avgCarbs / divisor).toFixed(1));
+    avg.avgFats = Number((avg.avgFats / divisor).toFixed(1));
+    avg.avgFiber = Number((avg.avgFiber / divisor).toFixed(1));
+
+    console.group("✅ Final Macro Averages");
+    console.log("📅 Date Range:", avg.dateRange);
+    console.log("🥩 Protein:", avg.avgProtein);
+    console.log("🍞 Carbs:  ", avg.avgCarbs);
+    console.log("🧈 Fats:   ", avg.avgFats);
+    console.log("🌾 Fiber:  ", avg.avgFiber);
+    console.groupEnd();
+
+    console.groupEnd();
+    return res.status(200).json(avg);
+
+  } catch (error) {
+    console.error("💥 Unexpected error in weekly average route:", error);
+    console.groupEnd();
+    res.status(500).json({ error: "Server error calculating weekly average" });
+  }
+});
+
+//Get Weekly Average and previousWeeklyAverage Weight//
+
+app.get('/weights/averages/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("📥 Incoming request for weight averages");
+    console.log("🔍 userId received:", userId);
+
+    const objectId = new mongoose.Types.ObjectId(userId); // 🔥 convert string to ObjectId
+    const record = await weightAverage.findOne({ userId: objectId });
+    console.log("📊 Record found:", record);
+
+    if (!record) {
+      console.log("❌ No weight averages found for this user");
+      return res.status(404).json({ message: 'No averages found for this user' });
+    }
+
+    res.json({
+      weeklyAverage: record.weeklyAverage,
+      previousWeeklyAverage: record.previousWeeklyAverage
+    });
+  } catch (error) {
+    console.error("💥 Error fetching weight averages:", error);
+    res.status(500).json({ message: "Error fetching weight data" });
+  }
+});
+
 ///////////////////////////////////// WEIGHT ENTRY /////////////////////////////////////
 
 // Endpoint to add weight entry
@@ -949,9 +1178,6 @@ app.post("/weights", verifyToken, async (req, res) => {
         res.status(500).json({ message: "Error adding/updating weight entry" });
     }
 });
-
-
-
 
 app.get("/weights/:userId/:date", verifyToken, async (req, res) => {
     const userId = req.params.userId;
@@ -1042,6 +1268,402 @@ app.delete("/weights/:id", verifyToken, async (req, res) => {
     }
 });
 
+// Weight Averages
+app.post('/weights/averages', async (req, res) => {
+  try {
+    const { userId, weeklyAverage, previousWeeklyAverage } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
+    const updatedRecord = await weightAverage.findOneAndUpdate(
+      { userId }, // Find document by userId
+      {
+        $set: {
+          weeklyAverage,
+          previousWeeklyAverage
+        }
+      },
+      {
+        upsert: true,              // Create if not exists
+        new: true,                 // Return updated doc
+        setDefaultsOnInsert: true // Apply schema defaults if inserting
+      }
+    );
+
+    res.status(200).json({ message: "Averages saved successfully", data: updatedRecord });
+
+  } catch (error) {
+    console.error("Error saving weight averages:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+///////////////////////////////////// MACRO COACH /////////////////////////////////////
+
+// Macro Coach Form
+
+app.post('/macrocoachform/submit', async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const formData = { ...req.body }; // shallow copy
+
+    // ✅ Remove optional macro fields if empty
+    const optionalFields = [
+      'carbIntake',
+      'proteinIntake',
+      'fatIntake',
+      'weightChange',
+      'current'
+    ];
+
+    optionalFields.forEach(field => {
+      if (!formData[field]) {
+        formData[field] = undefined; // so it can be $unset
+      }
+    });
+
+    // ✅ Update or insert, removing old optional fields as needed
+    const updatedForm = await macroCoachForm.findOneAndUpdate(
+      { userId },
+      {
+        $set: formData,
+        $unset: optionalFields.reduce((unsetFields, field) => {
+          if (formData[field] === undefined) {
+            unsetFields[field] = "";
+          }
+          return unsetFields;
+        }, {})
+      },
+      { new: true, upsert: true }
+    );
+
+    await userModel.findByIdAndUpdate(userId, { hasSubmittedCoachForm: true });
+
+    res.status(200).json({ message: 'Form submitted successfully!' });
+  } catch (err) {
+    console.error('🔴 Error during form submission:', err);
+    res.status(500).json({ error: 'Server error during form submission.' });
+  }
+});
+
+// Bu kod footerdaki koc a tikladigimda /macrocoach sayfasinin acilip acilmamasina karar veriyor
+    app.get("/user/:id", async (req, res) => {
+      try {
+        const user = await userModel.findById(req.params.id).select("hasSubmittedCoachForm");
+        if (!user) return res.status(404).json({ error: "User not found" });
+        res.json(user);
+      } catch (err) {
+        console.error("Error fetching user status:", err);
+        res.status(500).json({ error: "Server error" });
+      }
+    });
+
+// Bu kod macrocoach.jsx sayfasinina macroCoachForm datalarini fetch etmek icin
+
+    app.get('/macrocoachform/:userId', async (req, res) => {
+  
+      const { userId } = req.params;
+  
+      const formData = await macroCoachForm.findOne({ userId }); // adjust to your model name
+  
+      if (!formData) return res.status(404).json({ error: "Form not found" });
+  
+      res.json(formData);
+});
+
+// Macro Coach Macros // 
+
+// hesaplanan macro lari database eklemek icin ve macro coach in baslatildigi gun
+
+// POST /macrocoach/macros/:userId
+app.post('/macrocoach/macros/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    console.log('📩 Incoming POST /macrocoach/macros:', {
+      paramsUserId: userId,
+      rawBody: req.body
+    });
+
+    const {
+      calories, protein, carbs, fat, fiber,
+      reason,
+      reasonCode,
+      uiMessage,
+      goal, goalSpeed,
+      weeklyAverage, previousWeeklyAverage,
+    } = req.body;
+
+    const toNum = (x) =>
+      x === undefined || x === null || x === '' ? undefined : Number(x);
+
+    const payload = {
+      userId,
+      calories: toNum(calories),
+      protein: toNum(protein),
+      carbs: toNum(carbs),
+      fat: toNum(fat),
+      fiber: toNum(fiber),
+
+      reason:     reason ?? 'auto',
+      reasonCode: reasonCode ?? null,
+      uiMessage:  uiMessage ?? null,
+
+      goal:      goal ?? null,
+      goalSpeed: goalSpeed ?? null,
+
+      weeklyAverage:         toNum(weeklyAverage),
+      previousWeeklyAverage: toNum(previousWeeklyAverage),
+    };
+
+    console.log('📦 Normalized payload to save:', payload);
+
+    // Validate required numeric fields
+    for (const k of ['calories', 'protein', 'carbs', 'fat', 'fiber']) {
+      if (!Number.isFinite(payload[k])) {
+        console.error('❌ Invalid or missing numeric field:', k, 'value=', payload[k]);
+        return res.status(400).json({ message: `Invalid or missing field: ${k}` });
+      }
+    }
+
+    // 📝 Determine if this should be treated as the "initial"/reset snapshot
+    const explicitInitial = payload.reason === 'initial' || payload.reason === 'goal-changed' || payload.reasonCode === 'initial';
+    const existingCount = await macroCoachMacro.countDocuments({ userId });
+    const inferredInitial = existingCount === 0;
+    const isInitial = explicitInitial || inferredInitial;
+
+    console.log('📝 Initial snapshot detection:', {
+      userId,
+      explicitInitial,
+      inferredInitial,
+      isInitial,
+      existingCount,
+      payloadReason: payload.reason,
+      payloadReasonCode: payload.reasonCode
+    });
+
+    // 🧹 If this is an initial/goal-change snapshot, delete old macros first
+    if (isInitial) {
+      const deleted = await macroCoachMacro.deleteMany({ userId });
+      console.log(`🧹 Deleted ${deleted.deletedCount} previous macro snapshots for user ${userId}`);
+    }
+
+    // 1) Create new snapshot
+    const created = await macroCoachMacro.create(payload);
+    console.log('✅ Created macro snapshot:', created._id);
+
+    // 2) Update user's markers
+    const createdAt = created.createdAt ? new Date(created.createdAt) : new Date();
+    const user = await userModel.findById(userId).select('macroCoachStartedAt lastCheckInAt');
+
+    if (user) {
+      let changed = false;
+
+      console.log('👁️ User markers BEFORE save:', {
+        macroCoachStartedAt: user.macroCoachStartedAt,
+        lastCheckInAt: user.lastCheckInAt
+      });
+
+      if (isInitial) {
+        user.macroCoachStartedAt = createdAt;
+        user.lastCheckInAt = null; // reset check-ins on new plan
+        changed = true;
+        console.log('📅 Reset markers for initial snapshot:', createdAt.toISOString());
+      } else {
+        user.lastCheckInAt = createdAt;
+        changed = true;
+        console.log('⏱️ Updated lastCheckInAt:', createdAt.toISOString());
+      }
+
+      if (changed) {
+        await user.save();
+        console.log('✅ User markers saved successfully.');
+      }
+    } else {
+      console.warn('⚠️ User not found when updating markers:', userId);
+    }
+
+    return res.status(201).json(created);
+
+  } catch (error) {
+    console.error('❌ Error saving macros snapshot:', error);
+    return res.status(500).json({ message: 'Error saving macros snapshot' });
+  }
+});
+
+// READ the latest snapshot for a user
+app.get('/macrocoach/macros/:userId/latest', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const latest = await macroCoachMacro.findOne({ userId }).sort({ createdAt: -1 });
+    if (!latest) return res.status(404).json({ message: 'No macros yet' });
+    res.json(latest);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Error fetching latest macros' });
+  }
+});
+
+//READ full history (most recent first)
+app.get('/macrocoach/macros/:userId/history', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const history = await macroCoachMacro.find({ userId }).sort({ createdAt: -1 }).lean();
+
+    const form = await macroCoachForm.findOne({ userId }).lean();
+
+    res.json({ history, goal: form?.goal });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Error fetching history" });
+  }
+});
+
+// READ single snapshot by id
+app.get('/macrocoach/macros/item/:id', async (req, res) => {
+  try {
+    const item = await macroCoachMacro.findById(req.params.id).lean();
+    if (!item) return res.status(404).json({ message: 'Not found' });
+    res.json(item);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: 'Error fetching macros item' });
+  }
+});
+
+//// CheckIn Page ////
+
+app.get('/dailymacrototals/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const entries = await dailyMacroTotal.find({ userId }).sort({ eatenDate: -1 });
+    res.status(200).json(entries);
+  } catch (err) {
+    console.error("Error fetching daily macro totals:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// macro Target i checkIn sayfasina fetch etmek icin
+
+app.get('/macrocoach/macros/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const macros = await macroCoachMacro.findOne({ userId });
+
+    if (!macros) {
+      return res.status(404).json({ message: "No macros found for this user" });
+    }
+
+    res.status(200).json(macros);
+  } catch (error) {
+    console.error("❌ Error fetching macros:", error);
+    res.status(500).json({ message: "Error fetching macros" });
+  }
+});
+
+// macroCoachStartedAt fetch lemek icin
+// GET /users/:userId
+app.get('/users/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Only fetch what you need
+    const user = await userModel
+      .findById(userId)
+      .select('macroCoachStartedAt lastCheckInAt');
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      macroCoachStartedAt: user.macroCoachStartedAt || null,
+      lastCheckInAt: user.lastCheckInAt || null, // 👈 now included
+    });
+  } catch (error) {
+    console.error('❌ Error fetching user:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/coachmacroaverages/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { protein, carbs, fat } = req.body;
+
+  console.log("📩 Incoming weekly macro average POST:");
+  console.log("   → userId:", userId);
+  console.log("   → Data:", { protein, carbs, fat });
+
+  // Check if all values are present and numeric
+  if (
+    typeof protein !== "number" ||
+    typeof carbs !== "number" ||
+    typeof fat !== "number"
+  ) {
+    console.warn("⚠️ Missing or invalid macro data.");
+    return res.status(400).json({ message: "Missing or invalid macro data." });
+  }
+
+  try {
+    const weekOf = new Date(); // 👈 Use current date instead of getWeekStartDate()
+    weekOf.setHours(0, 0, 0, 0); // normalize time
+
+    console.log("📅 Using current date as week start date:", weekOf.toISOString());
+
+    // Check if this user already has an entry for this date
+    const existing = await macroCoachWeeklyMacroAverage.findOne({ userId, weekOf });
+
+    if (existing) {
+      console.log("🔄 Existing entry found. Updating...");
+      existing.protein = protein;
+      existing.carbs = carbs;
+      existing.fat = fat;
+      await existing.save();
+      console.log("✅ Weekly average updated:", existing);
+      return res.status(200).json({ message: "Weekly average updated.", data: existing });
+    }
+
+    console.log("➕ No entry found. Creating new...");
+    const newEntry = new macroCoachWeeklyMacroAverage({ userId, weekOf, protein, carbs, fat });
+    await newEntry.save();
+    console.log("✅ New weekly average saved:", newEntry);
+    return res.status(201).json({ message: "Weekly average saved.", data: newEntry });
+
+  } catch (err) {
+    console.error("❌ Error saving weekly average:", err);
+    return res.status(500).json({ message: "Server error." });
+  }
+});
+
+// CheckIn Report- Fetch weekly averages history
+
+app.get('/coachmacroaverages/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const entries = await macroCoachWeeklyMacroAverage
+      .find({ userId })
+      .sort({ weekOf: 1 }); // ascending by date
+
+    if (!entries.length) {
+      return res.status(404).json({ message: "No weekly macro averages found for this user." });
+    }
+
+    console.log(`📤 Sending ${entries.length} weekly macro average entries for user: ${userId}`);
+    return res.status(200).json(entries);
+
+  } catch (err) {
+    console.error("❌ Error fetching weekly averages:", err);
+    return res.status(500).json({ message: "Server error." });
+  }
+});
+
+///////////////////////////////////// MORE-GENERAL /////////////////////////////////////
+
+///////// ACCOUNT /////////
+
 // Endpoint to update the selected start date for a user
 
 app.put("/users/:userId/:startDate", verifyToken, async (req, res) => {
@@ -1129,7 +1751,6 @@ app.post('/update-username', async (req, res) => {
         res.status(500).json({ success: false, message: 'Kullanıcı adı güncellenirken bir hata oluştu.' });
     }
 });
-
 
 /////////////////////////// GOALS ///////////////////////////
 

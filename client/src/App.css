@@ -140,10 +140,128 @@ a {
     margin-left: 0.75rem;
 }
 
+/* dashboard page css */
+
+.dashboard-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.average-nutrition{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.average-nutrition .totals-container{
+    background-color: rgb(51, 6, 10);
+    border-radius: 0.45rem;
+}
+
+.avg-macro-header {
+    color: white;
+    font-weight: bold;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.average-weight{
+    margin-top: 0.75rem;
+}
+
+.macro-coach {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.macro-coach-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.macro-coach-days-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.macro-coach-number {
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+}
+
+.macro-coach-text {
+  font-size: 1.2rem;
+  color: white;
+}
+
+.macro-coach-actions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.macro-coach-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.macro-coach-btn:hover {
+  color: #d73750;
+}
+
+.divider {
+  width: 1px;
+  height: 1.5rem;
+  background-color: #ccc;
+}
+
+.macro-coach .avg-macro-header{
+    margin-top: -0.8rem;
+}
+
 /* search food page css */
 
 .search-container{
+    display: flex;
     flex-direction: column;
+}
+
+.create-food-button {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
+    
+}
+
+.create-food-button button {
+    color: white;
+    background-color: rgb(215, 55, 80);
+    padding: 0.25rem 0.55rem;
+    border: none;
+    border-radius: 0.45rem;
+    font-weight: bold;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 0.45rem;
 }
 
 .search {
@@ -1000,6 +1118,550 @@ label input{
     font-weight: bold;
 }
 
+/* macro coach page css*/
+
+.macrocoach-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: -1rem;
+}
+
+.macrocoach-countdown-macrogoals{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.macrocoach-countdown-macrogoals .countdown-container{
+    background-color: rgb(159, 155, 156);
+    border-radius: 0.45rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.macrocoach-countdown-macrogoals .totals-container{
+    background-color: black;
+    border-radius: 0.45rem;
+    width: 100%;
+}
+
+.current-macro-header {
+    color: white;
+    font-weight: bold;
+    width: fit-content;
+    margin: 0 auto;
+    margin-bottom: 0.45rem;
+}
+
+.macro-coach {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.macro-coach-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.macro-coach-days-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.macro-coach-number {
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+}
+
+.macro-coach-text {
+  font-size: 1.2rem;
+  color: white;
+}
+
+.macro-coach-actions {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.macro-coach-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.macro-coach-btn:hover {
+  color: #d73750;
+}
+
+.warning-dismiss {  
+    color: white;
+    background-color: rgb(215, 55, 80);
+    padding: 0.25rem 0.55rem;
+    border: none;
+    border-radius: 0.45rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.divider {
+  width: 1px;
+  height: 1.5rem;
+  background-color: #ccc;
+}
+
+.toast-macrocoach { 
+    background: #f3f1f1; 
+    border: 1px solid #ddd; 
+    border-radius: 0.35rem; 
+    padding: 0.5rem 0.75rem; 
+    font-size: 0.9rem; 
+    margin-top: 1rem;
+    margin-bottom: 1rem; }
+
+/* change goals butonu */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-btn.cancel {
+  background-color: #ccc;
+  color: black;
+}
+
+.modal-btn.confirm {
+  background-color: #d73750;
+  color: white;
+}
+
+
+/* CheckIn page css */
+
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background: #fff; /*buradan arka plani opak yapabilirsin*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.spinner-box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+}
+
+.macrocoach-checkin-macrogoals {
+  overflow: hidden;
+  width: 100%;
+}
+
+.checkinpage-macros{
+    background-color: black ;
+    border-radius: 0.45rem;
+    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+}
+
+.checkin-macro-header{
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    border-radius: 0.45rem 0.45rem 0 0;
+    text-align: center;
+    padding: 0 0.5rem;
+    margin-bottom: 0.45rem;
+}
+
+.checkin-calorie-history{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+    align-items: baseline;
+    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+}
+
+.history{
+    margin-right: 0.25rem;
+}
+
+.checkin{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+    border-top: 1px solid white;
+    padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+}
+
+.macro-adherance {
+  font-size: 1rem;
+  margin-top: 0.75rem;
+}
+
+.macro-adherance-header{
+    font-weight: bold;
+}
+
+.adherence-green {
+  color: #29a08c; /* green */
+  font-weight: bold;
+}
+
+.adherence-red {
+  color:rgb(249, 106, 128); /* red */
+  font-weight: bold;
+}
+
+.weight-averages{
+    margin-top: -0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.weight-header {
+    margin-top: 1rem;
+}
+
+.wa-label{
+    font-weight: normal;
+}
+
+.wa-value{
+    color: black;
+}
+
+.daily-macro-totals-container {
+  position: relative;
+  background: #fff;
+  margin-bottom: 4rem;
+  max-height: calc(100vh - 460px); /* ← ADJUST THIS VALUE based on actual header + macro box + button + margins */
+  overflow-y: auto;         /* scrolls here */
+  overflow-x: hidden;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.daily-macro-totals-container::-webkit-scrollbar { display: none; }
+
+/* Make header + rows share the exact same 5-column grid */
+.macro-row,
+.macro-row.macro-header.fixed-header {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr 1fr; /* Tarih a bit wider */
+  column-gap: 12px;
+  align-items: center;
+  padding: 0.75rem 12px;
+  box-sizing: border-box;
+}
+
+/* Sticky header visuals */
+.macro-row.macro-header.fixed-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+  border-bottom: 2px solid #333;
+  margin-top: 0;
+}
+
+.scrollable-macro-list {
+  max-height: 45vh;   /* adjust height as needed */
+  overflow-y: auto;
+  border: 1px solid #ddd; /* optional: for visual structure */
+  border-radius: 8px;     /* optional */
+  /* margin-bottom: 10rem; */
+}
+
+/* Regular row line + font */
+.macro-row:not(.macro-header) {
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+/* Header styling (no extra margins that shift widths) */
+.macro-header {
+  font-weight: 600;
+  background-color: #f3f1f1;
+  border-radius: 0.35rem 0.35rem 0 0;
+  margin-top: 0;            /* <- important so it doesn't push columns */
+}
+
+/* Cells no longer need flex rules */
+.macro-cell {
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+  padding: 0;               /* padding handled on .macro-row */
+}
+
+
+
+.checkin-button-container {
+    color: white;
+    background-color: rgb(215, 55, 80);
+    padding: 0.45rem 0.55rem;
+    border: none;
+    border-radius: 0.45rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.checkin-button{
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.checkin-button.btn-disabled,
+.checkin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.next-checkin-hint {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* CheckIn History css */
+
+/* Container */
+.checkinhistory-container {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 80px); /* ← ADJUST THIS VALUE based on actual header + macro box + button + margins */
+}
+
+.fixed-history-header {
+  flex-shrink: 0;
+  background: white;
+  z-index: 10;
+}
+
+.scrollable-history-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE/Edge */
+}
+
+.scrollable-history-list::-webkit-scrollbar {
+  display: none;                 /* WebKit */
+}
+
+/* Make the list fill its container and stretch children */
+.history-list {
+  display: grid;              /* simpler than flex for 1-column stretch */
+  grid-template-columns: 1fr; 
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 0.35rem;
+  overflow: hidden;
+}
+
+/* Each row spans full width */
+.history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto; /* left info + arrow; allow shrink */
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  /* ensure stretch even if parent changes layout later */
+  justify-self: stretch;
+}
+
+/* Rest of your styles unchanged */
+.history-row:last-child { border-bottom: none; }
+.history-row:hover { background: #f9f9f9; }
+
+.row-left { display: flex; flex-direction: column; gap: 2px; }
+.row-title { text-align: left }
+.row-sub { text-align: left; font-size: 0.85rem; color: #666; }
+.row-right { font-size: 1rem; color: rgb(215, 55, 80); }
+
+/* Title, goal text, toast — unchanged */
+.checkinhistory-container h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; text-align: center; }
+.checkinhistory-container > p { font-size: 0.95rem; font-weight: 500; color: #444; margin-bottom: 0.75rem; text-align: center; }
+.toast { background: #f3f1f1; border: 1px solid #ddd; border-radius: 0.35rem; padding: 0.5rem 0.75rem; font-size: 0.9rem; margin-bottom: 1rem; }
+
+/* CheckIn Report css */
+
+.checkinreport-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.report-date{
+    font-size: 0.75rem;
+}
+
+.coach-message-text{
+    margin-top: 0.85rem;
+    /* margin-bottom: 0.25rem; */
+    padding-left: 0.45rem;
+    /* border: 1px solid black; */
+    /* padding: 1rem 1rem 1rem 1rem; */
+    width: 100%;
+    border-radius: 0.35rem;
+}
+
+.report-total-macros{
+    background-color: black;
+    color: white;
+    width: 90%;
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin-top: 0.45rem;
+}
+
+.report-total-macros h3{
+    font-size: 0.95rem;
+}
+
+.previous-average {
+    margin-left: 1rem;
+    padding-left: 0;
+    text-align: left;
+    width: 90%;
+}
+
+.checkin-progress-title{
+    margin-top: 0.70rem;
+}
+
+/* Progress block container */
+.checkin-progress-block {
+  width: 90%;
+  background-color: rgb(215, 55, 80);
+  padding: 0.1rem 0.5rem 0.1rem 0.5rem;
+  border: 2px solid black;
+  border-radius: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.45rem;
+}
+
+/* Inner row layout */
+.checkin-progress-block .progress-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: center;
+  /* border-top: 1px solid white; */
+}
+
+/* Each cell (Start, End, Change) */
+.checkin-progress-block .progress-cell {
+  flex: 1;
+  padding: 0.35rem 0;
+  color: white;
+  position: relative; /* so ::after can be positioned */
+}
+
+/* Divider line */
+.checkin-progress-block .progress-cell:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 10%;   /* start below the top */
+  bottom: 10%; /* stop before bottom */
+  right: 0;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* Labels under each metric */
+.checkin-progress-block .progress-cell .label {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color:white;
+}
+
+/* Values (kg numbers) */
+.checkin-progress-block .progress-cell .val {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
 
 /* meal function page css */
 
@@ -1287,11 +1949,16 @@ border: 3px solid rgb(249, 106, 128);
 .macrogoals-list .list-headings {
     display: flex;
     justify-content:space-between ;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.coach-note{
+    font-weight: normal;
 }
 
 .macro-calories {
-    padding-right: 0.30rem
+    padding-right: 0.30rem;
+    display: flex;
 }
 
 .macrogoals-list{
@@ -1387,3 +2054,203 @@ border: 3px solid rgb(249, 106, 128);
 .footer li{
     margin-bottom: 2rem;
 }
+
+/* macro coach form */
+
+.macro-container{
+    height: 100vh;
+    width:100%;
+    background-color: white;
+    color: black;
+    padding: 1rem 1rem;
+    display: flex;
+    align-items: flex-start;
+}
+
+.container.macro-coach-form {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.macro-coach-form .macro-coach-form-label-intro-card h2{
+    font-size: 1rem;
+    color: #d73750;
+}
+
+.macro-coach-form-label-intro-card .btn-primary{
+    margin-top: 0.75rem;
+}
+
+.macro-coach-form-discription{
+      text-align: center;
+        font-size: 0.75rem;
+}
+
+.macro-coach-form-discription p{
+      margin-bottom: 0.75rem;
+}
+
+.macro-coach-form h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
+  margin-top: -0.55rem;
+  color: #1a1a1a;
+}
+
+.macro-coach-form h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+}
+
+.macro-coach-gender-unit{
+    display: flex;
+}
+
+.macro-warning{
+    margin-bottom: 0.55rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color:rgb(215, 55, 80);
+}
+
+.macro-coach-form-label {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+  margin-left: -0.85rem;
+}
+
+label input[type="radio"],
+label input[type="checkbox"] {
+  vertical-align: middle;
+}
+
+.macro-coach-form div {
+  margin-bottom: 0.75rem;
+}
+
+button.btn-macro-coach-form,
+button.btn-primary {
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+button.btn-macro-coach-form {
+  background-color: rgb(215, 55, 80);
+  color: white;
+}
+
+button.btn-macro-coach-form:hover {
+  background-color: #d5d5d5;
+}
+
+button.btn-primary {
+  background-color: #d5d5d5;
+  color: rgb(21, 21, 21);
+}
+
+button.btn-primary:hover {
+  background-color: rgb(215, 55, 80);
+}
+
+.macro-coach-height-imperial {
+  display: flex;
+  gap: 0.25rem; /* space between the inputs */
+}
+
+/* Body Fat slider css */
+
+.fat-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.fat-slider-image img {
+  width: 120px;
+  height: auto;
+}
+
+.fat-slider-label {
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 0.5rem;
+}
+
+.fat-slider {
+  width: 80%;
+  max-width: 300px;
+  height: 8px;
+  background: rgb(235, 235, 235);
+  border: 1px solid rgb(163, 163, 163);
+  border-radius: 5px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Chrome, Safari (WebKit) */
+.fat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: #cc1f43; /* your red */
+  border-radius: 50%;
+  cursor: pointer;
+  margin-top: -1px; /* 🔥 centers the thumb vertically */
+  border: none;
+}
+
+/* Firefox */
+.fat-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #cc1f43;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+/* Optional: Firefox track styling */
+.fat-slider::-moz-range-track {
+  background: #ccc;
+  height: 6px;
+  border-radius: 5px;
+}
+
+.fat-slider-description {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 1rem;
+}
+
