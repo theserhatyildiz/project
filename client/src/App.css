@@ -10,13 +10,16 @@ html::-webkit-scrollbar {
   }
 
 .container{
-    height: 100lvh;
+    height: 100vh;
     width:100%;
     background-color: white;
     color: black;
     padding: 1rem 1rem;
     display: flex;
     align-items: center;
+    padding: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 /* register page css */
@@ -146,9 +149,6 @@ a {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .average-nutrition{
@@ -245,9 +245,6 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
-    padding: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .create-food-button {
@@ -459,26 +456,41 @@ a {
 
 /* diet page css */
 
-/* Styles for the fixed date box and totals container */
-.fixed-header {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background-color: white; /* Adjust as needed */
-    z-index: 1000;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 2rem;
-    padding-right: 2rem;
-    display: flex;
-    flex-direction: column;
+.diet-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full screen */
+  overflow: hidden;
+  position: relative;
 }
 
-/* Scrollable content with natural page scroll */
+/* Fixed header at top */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 1000;
+  padding: 0.55rem 2rem;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+/* Scrollable content starts after fixed header */
 .scrollable-content {
-    margin-top: 100px; /* spacing below fixed header */
-    overflow-y: visible;
-    max-height: none;
-    width: 100%;
+  flex: 1;
+  margin-top: 10rem; /* Adjust to match your fixed-header's height */
+  overflow-y: auto;
+  padding-bottom: 5.5rem; /* To prevent footer overlap */
+  padding-left: 1rem;
+  padding-right: 1rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.scrollable-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .spinner-container {
@@ -486,19 +498,6 @@ a {
     justify-content: center;
     align-items: center;
     height: 100vh;
-}
-
-/* Adjustments for the layout */
-.container.diet-container {
-    height: auto; /* allow natural height based on content */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    row-gap: 0.65rem;
-    background-color:white; 
-    width: 100%;
-    margin-bottom: 4.5rem; /* adjustment for the gap between footer*/
-    margin-top: 5.5rem;
 }
 
 .fixed-header .day-date{
@@ -539,10 +538,6 @@ a {
     margin-top: 0.25rem;
     color: black;
     /* color: rgb(249, 106, 128); */
-}
-
-.totals-container{
-    width: 100%;
 }
 
 .totals-container h3{
