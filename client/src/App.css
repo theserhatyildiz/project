@@ -10,7 +10,7 @@ html::-webkit-scrollbar {
   }
 
 .container{
-    min-height: calc(100% + env(safe-area-inset-top));
+    height: 100dvh;
     width:100%;
     background-color: white;
     color: black;
