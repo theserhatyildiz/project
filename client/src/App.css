@@ -15,7 +15,6 @@ html::-webkit-scrollbar {
     background-color: white;
     color: black;
     padding: 1rem 1rem;
-    padding-top: calc(env(safe-area-inset-bottom, 0px) + 1rem);
     display: flex;
     align-items: center;
 }
@@ -243,6 +242,7 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
+    height: 100lvh;
 }
 
 .create-food-button {
