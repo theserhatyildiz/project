@@ -543,6 +543,10 @@ a {
     /* color: rgb(249, 106, 128); */
 }
 
+.totals-container{
+    width: 100%;
+}
+
 .totals-container h3{
     display: flex;
     justify-content: flex-start;
