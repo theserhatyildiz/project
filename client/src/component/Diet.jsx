@@ -34,12 +34,22 @@ export default function Diet() {
   dailyItems: false,
   });
 
+  const headerRef = useRef(null); // ✅ new ref for header
+  const scrollRef = useRef(null); // ✅ new ref for scrollable area
+
   useEffect(() => {
   if (dataReady.csrfToken && dataReady.macroGoals && dataReady.dailyItems) {
     setLoading(false);
     console.log("✅ All Diet page data fetched — hiding spinner");
   }
   }, [dataReady]);
+
+    useEffect(() => {
+    if (headerRef.current && scrollRef.current) {
+      const height = headerRef.current.offsetHeight;
+      scrollRef.current.style.paddingTop = `${height}px`; // ✅ dynamically apply padding
+    }
+  }, [loading]);
 
   // ------------------ CSRF Token ------------------
   useEffect(() => {
@@ -302,7 +312,7 @@ export default function Diet() {
       ) : (
         <>
           {/* Fixed Header */}
-          <div className="fixed-header">
+          <div className="fixed-header" ref={headerRef}>
             <div className="day-date">
               <button onClick={() => changeDate(-1)}>{"<"}</button>
               {relativeDay && <p>{relativeDay}: </p>}
@@ -359,7 +369,7 @@ export default function Diet() {
           </div>
 
           {/* Scrollable meals area */}
-          <div className="scrollable-content">
+          <div className="scrollable-content" ref={scrollRef}>
             {meals.map((meal) => {
               const eatenDate = `${currentDateView.getMonth() + 1}/${currentDateView.getDate()}/${currentDateView.getFullYear()}`;
               return (
