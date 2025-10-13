@@ -17,6 +17,9 @@ html::-webkit-scrollbar {
     padding: 1rem 1rem;
     display: flex;
     align-items: center;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 /* register page css */
