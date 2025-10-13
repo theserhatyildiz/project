@@ -1006,7 +1006,10 @@ app.get('/macro-totals/weekly-average', async (req, res) => {
     }
 
     const formatDateString = (date) => date.toISOString().split("T")[0];
-    const today = new Date();
+    const stripTime = (date) => new Date(date.toISOString().split("T")[0]);
+
+    let today = new Date();
+    today = stripTime(today);
 
     if (includeToday !== 'true') {
       today.setDate(today.getDate() - 1);
@@ -1015,15 +1018,15 @@ app.get('/macro-totals/weekly-average', async (req, res) => {
       console.log("📅 Including today in date range");
     }
 
-    // Use macroCoachStartedAt if available
     let baseDate = null;
     if (startDate && startDate !== 'null') {
       baseDate = new Date(startDate);
       if (isNaN(baseDate)) {
-        console.warn("⚠️ Invalid startDate, falling back to last 7 days logic");
+        console.warn("⚠️ Invalid startDate, falling back to rolling 7-day logic");
         baseDate = null;
       } else {
-        console.log("📌 Using macroCoachStartedAt:", baseDate.toISOString());
+        baseDate = stripTime(baseDate);
+        console.log("📌 Using macroCoachStartedAt (normalized):", baseDate.toISOString());
       }
     }
 
@@ -1044,25 +1047,23 @@ app.get('/macro-totals/weekly-average', async (req, res) => {
 
       console.log(`📅 Calculating for week ${currentWeek + 1} since macro coach start`);
       console.log("📆 MacroCoach week dates:", allDates);
-
     } else {
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today.getTime() - i * oneDay);
         allDates.push(formatDateString(d));
       }
 
-      console.log("📅 No start date, using rolling last 7 days:", allDates);
+      console.log("📅 No startDate, using rolling last 7 days:", allDates);
     }
 
-    // Fetch entries
     const rawEntries = await dailyMacroTotal.find({
       userId: mongoUserId,
       eatenDate: { $in: allDates }
     }).lean();
 
     console.log("📄 Raw DB entries found:", rawEntries.length);
+    rawEntries.forEach(entry => console.log("📊 Record found:", entry));
 
-    // Organize by date
     const byDate = {};
     for (const entry of rawEntries) {
       byDate[entry.eatenDate] = entry;
@@ -1081,7 +1082,6 @@ app.get('/macro-totals/weekly-average', async (req, res) => {
 
     console.log("📊 Final 7-day padded entries:", paddedEntries);
 
-    // Manual average
     const avg = {
       avgProtein: 0,
       avgCarbs: 0,
