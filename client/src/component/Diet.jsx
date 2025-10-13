@@ -1,5 +1,5 @@
 import { UserContext } from "../context/UserContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Meal from "./Meal";
