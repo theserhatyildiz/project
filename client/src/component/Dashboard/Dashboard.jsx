@@ -297,39 +297,39 @@ useEffect(() => {
         ) : (
           <>
             {/* ---- MACRO TOTALS ---- */}
-            <div className="totals-container">
+            <div className="totals-container dashboard-macros">
               <p className="avg-macro-header">Haftalık Ortalama</p>
               <div className="total-macros">
                 <div className="totals-header">
                   <h3>Total Kalori: {avgCalories} kcal</h3>
                   <h3>Uyum: %{weeklyMacroAdherence}</h3>
                 </div>
-                <div className="totals-row">
+                <div className="totals-row dashboard-totals-row">
                   <div className="totals">
                     <p className="n-title">Pro</p>
                     <p className="n-value">{weeklyAverage?.avgProtein || 0}g</p>
-                    <div className="macroGoals-digits">
+                    <div className="macroGoals-digits dashboard-macroGoals-digits">
                       <p>{macroGoals.goalProtein || 0}g</p>
                     </div>
                   </div>
                   <div className="totals">
                     <p className="n-title">Karb</p>
                     <p className="n-value">{weeklyAverage?.avgCarbs || 0}g</p>
-                    <div className="macroGoals-digits">
+                    <div className="macroGoals-digits dashboard-macroGoals-digits">
                       <p>{macroGoals.goalCarbohydrate || 0}g</p>
                     </div>
                   </div>
                   <div className="totals">
                     <p className="n-title">Yağ</p>
                     <p className="n-value">{weeklyAverage?.avgFats || 0}g</p>
-                    <div className="macroGoals-digits">
+                    <div className="macroGoals-digits dashboard-macroGoals-digits">
                       <p>{macroGoals.goalFat || 0}g</p>
                     </div>
                   </div>
                   <div className="totals">
                     <p className="n-title">Lif</p>
                     <p className="n-value">{weeklyAverage?.avgFiber || 0}g</p>
-                    <div className="macroGoals-digits">
+                    <div className="macroGoals-digits dashboard-macroGoals-digits">
                       <p>{macroGoals.goalFiber || 0}g</p>
                     </div>
                   </div>
@@ -341,7 +341,7 @@ useEffect(() => {
             <div className="totals-container average-weight">
               <p className="avg-macro-header">Haftalık Ortalama Ağırlık</p>
               <div className="total-macros">
-                <div className="weight-data">
+                <div className="weight-data dashboard-weight-data">
                   <div className="weight-data-info">
                     <p className="info-title-avg">Güncel</p>
                     <p className="info-value-avg">{weightAverages.weeklyAverage || 0}kg</p>
@@ -351,7 +351,10 @@ useEffect(() => {
                     <p className="info-value-avg">{weightAverages.previousWeeklyAverage || 0}kg</p>
                   </div>
                 </div>
+                <div className="weight-change"><p>Kilo değişimi:{weightChangeRounded > 0 ? "+" : ""}  {weightChangeRounded}kg</p></div>
               </div>
+              
+            
             </div>
 
             {/* ---- MACRO COACH ---- */}

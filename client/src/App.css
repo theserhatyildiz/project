@@ -17,9 +17,6 @@ html::-webkit-scrollbar {
     padding: 1rem 1rem;
     display: flex;
     align-items: center;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 /* register page css */
@@ -149,9 +146,6 @@ a {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .average-nutrition{
@@ -163,8 +157,9 @@ a {
 }
 
 .average-nutrition .totals-container{
-    background-color: rgb(51, 6, 10);
-    border-radius: 0.45rem;
+    background-color: rgb(35, 35, 35);
+    border-radius: 0.65rem;
+    margin-top: 1rem;
 }
 
 .avg-macro-header {
@@ -177,10 +172,34 @@ a {
 .totals-header{
     display: flex;
     justify-content: space-between;
+    margin-top: 0.35rem;
 }
 
-.average-weight{
-    margin-top: 0.75rem;
+.totals-row.dashboard-totals-row{
+    margin-top: 0.45rem;
+    margin-bottom: 0.45rem;
+}
+
+.macroGoals-digits.dashboard-macroGoals-digits{
+    margin-top: 0.15rem;
+}
+
+.weight-data.dashboard-weight-data{  
+    margin-bottom: 0rem;
+}
+
+.totals-container.average-weight{
+    margin-top: 2rem;
+}
+
+.weight-change{
+    color:white;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.totals-container.macro-coach{
+    margin-top: 2rem;
 }
 
 .macro-coach {
@@ -253,9 +272,6 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .create-food-button {
@@ -482,9 +498,7 @@ a {
   width: 100%;
   background-color: white;
   z-index: 1000;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-left: 2rem;
-  padding-right: 2rem;
+  padding: 0.55rem 2rem;
   display: flex;
   flex-direction: column;
   height: auto;
@@ -493,7 +507,7 @@ a {
 /* Scrollable content starts after fixed header */
 .scrollable-content {
   flex: 1;
-  /* margin-top: 10rem; */
+  margin-top: 10rem; /* Adjust to match your fixed-header's height */
   overflow-y: auto;
   padding-bottom: 5.5rem; /* To prevent footer overlap */
   padding-left: 1rem;
@@ -523,7 +537,7 @@ a {
     background-color:white; 
     width: 100%;
     margin-bottom: 4.5rem; /* adjustment for the gap between footer*/
-    margin-top: 5.5rem;
+    margin-top: 2.2rem;
 }
 
 .fixed-header .day-date{
@@ -789,9 +803,6 @@ button {
 .createfood-container{
     flex-direction: column;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .createfood-container .form{
@@ -1160,10 +1171,7 @@ label input{
     display: flex;
     flex-direction: column;
     width: 100%;
-    /* margin-top: -1rem; */
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
+    margin-top: -1rem;
 }
 
 .macrocoach-countdown-macrogoals{
@@ -1540,9 +1548,6 @@ label input{
 .checkinhistory-container {
   display: flex;
   flex-direction: column;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-left: 1rem;
-  padding-right: 1rem;
   max-height: calc(100vh - 80px); /* ← ADJUST THIS VALUE based on actual header + macro box + button + margins */
 }
 
@@ -1610,9 +1615,6 @@ label input{
 .checkinreport-container{
     display: flex;
     flex-direction: column;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .report-date{
@@ -1817,9 +1819,6 @@ label input{
 .more-container{
     display: flex;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 .more-list-heading-group{
@@ -1866,9 +1865,6 @@ label input{
 .account-container{
     display: flex;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 
 }
 
@@ -1969,9 +1965,6 @@ border: 3px solid rgb(249, 106, 128);
 .goals-container{
     display: flex;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 
 }
 
@@ -1996,9 +1989,6 @@ border: 3px solid rgb(249, 106, 128);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 }
 
 
@@ -2069,9 +2059,6 @@ border: 3px solid rgb(249, 106, 128);
 .about-container{
     display: flex;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
 
 }
 
@@ -2122,9 +2109,7 @@ border: 3px solid rgb(249, 106, 128);
     width:100%;
     background-color: white;
     color: black;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 1rem 1rem;
     display: flex;
     align-items: flex-start;
 }
@@ -2255,9 +2240,6 @@ button.btn-primary:hover {
   align-items: center;
   gap: 1rem;
   text-align: center;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 
 .fat-slider-image img {
