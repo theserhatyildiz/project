@@ -50,7 +50,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchCsrfToken() {
       try {
-        const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
         const { csrfToken } = await response.json();
         if (csrfToken) {
           setCsrfToken(csrfToken);
@@ -71,11 +71,11 @@ export default function Dashboard() {
     (async () => {
       try {
         const [coachRes, savedRes] = await Promise.allSettled([
-          fetch(`http://localhost:8000/macrocoach/macros/${loggedUser.userid}`, {
+          fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/macrocoach/macros/${loggedUser.userid}`, {
             headers: { Authorization: `Bearer ${loggedUser.token}` },
             credentials: "include",
           }),
-          fetch("http://localhost:8000/macro-goals", {
+          fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
             headers: {
               Authorization: `Bearer ${loggedUser.token}`,
               "CSRF-Token": csrfToken,
@@ -131,7 +131,7 @@ useEffect(() => {
       ? new Date(macroCoachStartedAt).toISOString()
       : "";
 
-    const url = `http://localhost:8000/macro-totals/weekly-average?userId=${loggedUser.userid}&includeToday=true&startDate=${encodeURIComponent(startDateParam)}`;
+    const url = `https://galwinapp1-c1d71c579009.herokuapp.com/macro-totals/weekly-average?userId=${loggedUser.userid}&includeToday=true&startDate=${encodeURIComponent(startDateParam)}`;
 
     console.log("🔄 Fetching weekly average macros from:", url);
 
@@ -164,7 +164,7 @@ useEffect(() => {
   useEffect(() => {
     async function fetchWeightAverages() {
       try {
-        const response = await fetch(`http://localhost:8000/weights/averages/${loggedUser.userid}`, {
+        const response = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/weights/averages/${loggedUser.userid}`, {
           headers: {
             Authorization: `Bearer ${loggedUser.token}`,
             "CSRF-Token": csrfToken,
@@ -194,7 +194,7 @@ useEffect(() => {
 
     console.log("📡 Fetching macroCoachStartedAt and lastCheckInAt...");
     try {
-      const res = await fetch(`http://localhost:8000/users/${loggedUser.userid}`, {
+      const res = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/users/${loggedUser.userid}`, {
         headers: { Authorization: `Bearer ${loggedUser.token}` },
         credentials: "include",
       });
