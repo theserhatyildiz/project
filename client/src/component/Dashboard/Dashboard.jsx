@@ -249,7 +249,7 @@ useEffect(() => {
         continue;
       }
 
-      const ratio = Math.min(avg / goal, 1);
+      const ratio = avg / goal;
       const percent = Math.round(ratio * 100);
 
       console.log(`✅ ${label} adherence: ${percent}%`);
