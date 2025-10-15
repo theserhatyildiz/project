@@ -11,6 +11,9 @@ export default function Dashboard() {
   const { loggedUser } = useContext(UserContext);
   const [macroGoals, setMacroGoals] = useState({});
   const [weeklyAverage, setWeeklyAverage] = useState(null);
+
+  const [weeklyMacroAdherence, setWeeklyMacroAdherence] = useState(null);
+
   const [weightAverages, setWeightAverages] = useState({
     weeklyAverage: null,
     previousWeeklyAverage: null,
@@ -47,7 +50,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchCsrfToken() {
       try {
-        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
+        const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
         const { csrfToken } = await response.json();
         if (csrfToken) {
           setCsrfToken(csrfToken);
@@ -68,11 +71,11 @@ export default function Dashboard() {
     (async () => {
       try {
         const [coachRes, savedRes] = await Promise.allSettled([
-          fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/macrocoach/macros/${loggedUser.userid}`, {
+          fetch(`http://localhost:8000/macrocoach/macros/${loggedUser.userid}`, {
             headers: { Authorization: `Bearer ${loggedUser.token}` },
             credentials: "include",
           }),
-          fetch("https://galwinapp1-c1d71c579009.herokuapp.com/macro-goals", {
+          fetch("http://localhost:8000/macro-goals", {
             headers: {
               Authorization: `Bearer ${loggedUser.token}`,
               "CSRF-Token": csrfToken,
@@ -128,7 +131,7 @@ useEffect(() => {
       ? new Date(macroCoachStartedAt).toISOString()
       : "";
 
-    const url = `https://galwinapp1-c1d71c579009.herokuapp.com/macro-totals/weekly-average?userId=${loggedUser.userid}&includeToday=true&startDate=${encodeURIComponent(startDateParam)}`;
+    const url = `http://localhost:8000/macro-totals/weekly-average?userId=${loggedUser.userid}&includeToday=true&startDate=${encodeURIComponent(startDateParam)}`;
 
     console.log("🔄 Fetching weekly average macros from:", url);
 
@@ -161,7 +164,7 @@ useEffect(() => {
   useEffect(() => {
     async function fetchWeightAverages() {
       try {
-        const response = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/weights/averages/${loggedUser.userid}`, {
+        const response = await fetch(`http://localhost:8000/weights/averages/${loggedUser.userid}`, {
           headers: {
             Authorization: `Bearer ${loggedUser.token}`,
             "CSRF-Token": csrfToken,
@@ -191,7 +194,7 @@ useEffect(() => {
 
     console.log("📡 Fetching macroCoachStartedAt and lastCheckInAt...");
     try {
-      const res = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/users/${loggedUser.userid}`, {
+      const res = await fetch(`http://localhost:8000/users/${loggedUser.userid}`, {
         headers: { Authorization: `Bearer ${loggedUser.token}` },
         credentials: "include",
       });
@@ -216,7 +219,65 @@ useEffect(() => {
   fetchMarkers();
 }, [loggedUser]);
 
-  // 🟡 Macro calorie calculation
+ // ------------------- CALCULATE WEEKLY ADHERANCE -------------------
+useEffect(() => {
+  if (!weeklyAverage || !macroGoals) return;
+
+  const calculateAdherence = () => {
+    // 🧭 Explicitly define property name mappings
+    const macroMap = [
+      { avgKey: "avgProtein", goalKey: "goalProtein", label: "Protein" },
+      { avgKey: "avgCarbs", goalKey: "goalCarbohydrate", label: "Carbohydrate" },
+      { avgKey: "avgFats", goalKey: "goalFat", label: "Fat" },
+    ];
+
+    let totalAdherence = 0;
+    let count = 0;
+
+    console.log("📊 Starting adherence calculation...");
+    console.log("📦 weeklyAverage object:", weeklyAverage);
+    console.log("📦 macroGoals object:", macroGoals);
+
+    for (const { avgKey, goalKey, label } of macroMap) {
+      const avg = Number(weeklyAverage[avgKey]);
+      const goal = Number(macroGoals[goalKey]);
+
+      console.log(`➡️ ${label} → Avg: ${avg}, Goal: ${goal}`);
+
+      if (!isFinite(avg) || !isFinite(goal) || goal <= 0) {
+        console.warn(`⚠️ Skipping ${label} due to invalid value.`);
+        continue;
+      }
+
+      const ratio = Math.min(avg / goal, 1);
+      const percent = Math.round(ratio * 100);
+
+      console.log(`✅ ${label} adherence: ${percent}%`);
+
+      totalAdherence += ratio;
+      count++;
+    }
+
+    const finalAdherence =
+      count > 0 ? Math.round((totalAdherence / count) * 100) : 0;
+
+    console.log("🎯 Final weekly macro adherence:", finalAdherence + "%");
+    setWeeklyMacroAdherence(finalAdherence);
+  };
+
+  calculateAdherence();
+}, [weeklyAverage, macroGoals]);
+
+// console.log("Macro adherence debug:", {
+//   avgProtein: weeklyAverage?.avgProtein,
+//   goalProtein: macroGoals?.goalProtein,
+//   avgCarbs: weeklyAverage?.avgCarbs,
+//   goalCarbohydrate: macroGoals?.goalCarbohydrate,
+//   avgFats: weeklyAverage?.avgFats,
+//   goalFat: macroGoals?.goalFat,
+// });
+
+  // ------------------- CALCULATE AVERAGE CALORIES -------------------
   const avgCalories = weeklyAverage
     ? (
         weeklyAverage.avgProtein * 4 +
@@ -241,6 +302,7 @@ useEffect(() => {
               <div className="total-macros">
                 <div>
                   <h3>Total Kalori: {avgCalories} kcal</h3>
+                  <h3>Makro Uyumu: %{weeklyMacroAdherence}</h3>
                 </div>
                 <div className="totals-row">
                   <div className="totals">
