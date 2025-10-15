@@ -300,9 +300,9 @@ useEffect(() => {
             <div className="totals-container">
               <p className="avg-macro-header">Haftalık Ortalama</p>
               <div className="total-macros">
-                <div>
+                <div className="totals-header">
                   <h3>Total Kalori: {avgCalories} kcal</h3>
-                  <h3>Makro Uyumu: %{weeklyMacroAdherence}</h3>
+                  <h3>Uyum: %{weeklyMacroAdherence}</h3>
                 </div>
                 <div className="totals-row">
                   <div className="totals">
