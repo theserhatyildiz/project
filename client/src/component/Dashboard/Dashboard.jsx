@@ -286,6 +286,10 @@ useEffect(() => {
       ).toFixed(0)
     : 0;
 
+     // ------------------- CALCULATE WEIGHT DIFFERENCE -------------------
+  const weightChange = (weightAverages.weeklyAverage ?? 0) - (weightAverages.previousWeeklyAverage ?? 0);
+  const weightChangeRounded = weightChange.toFixed(1);
+
   return (
   <div className="page-wrapper">
     <section className="container dashboard-container">
