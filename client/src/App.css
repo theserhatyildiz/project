@@ -17,6 +17,9 @@ html::-webkit-scrollbar {
     padding: 1rem 1rem;
     display: flex;
     align-items: center;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 /* register page css */
@@ -272,6 +275,9 @@ a {
 .search-container{
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .create-food-button {
@@ -498,7 +504,9 @@ a {
   width: 100%;
   background-color: white;
   z-index: 1000;
-  padding: 0.55rem 2rem;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: 2rem;
+  padding-right: 2rem;
   display: flex;
   flex-direction: column;
   height: auto;
@@ -507,7 +515,7 @@ a {
 /* Scrollable content starts after fixed header */
 .scrollable-content {
   flex: 1;
-  margin-top: 10rem; /* Adjust to match your fixed-header's height */
+  /* margin-top: 10rem; */
   overflow-y: auto;
   padding-bottom: 5.5rem; /* To prevent footer overlap */
   padding-left: 1rem;
@@ -537,7 +545,7 @@ a {
     background-color:white; 
     width: 100%;
     margin-bottom: 4.5rem; /* adjustment for the gap between footer*/
-    margin-top: 2.2rem;
+    margin-top: 5.5rem;
 }
 
 .fixed-header .day-date{
@@ -803,6 +811,9 @@ button {
 .createfood-container{
     flex-direction: column;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .createfood-container .form{
@@ -1171,7 +1182,10 @@ label input{
     display: flex;
     flex-direction: column;
     width: 100%;
-    margin-top: -1rem;
+    /* margin-top: -1rem; */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .macrocoach-countdown-macrogoals{
@@ -1548,6 +1562,9 @@ label input{
 .checkinhistory-container {
   display: flex;
   flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: 1rem;
+  padding-right: 1rem;
   max-height: calc(100vh - 80px); /* ← ADJUST THIS VALUE based on actual header + macro box + button + margins */
 }
 
@@ -1615,6 +1632,9 @@ label input{
 .checkinreport-container{
     display: flex;
     flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .report-date{
@@ -1819,6 +1839,9 @@ label input{
 .more-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .more-list-heading-group{
@@ -1865,6 +1888,9 @@ label input{
 .account-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -1965,6 +1991,9 @@ border: 3px solid rgb(249, 106, 128);
 .goals-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -1989,6 +2018,9 @@ border: 3px solid rgb(249, 106, 128);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 
@@ -2059,6 +2091,9 @@ border: 3px solid rgb(249, 106, 128);
 .about-container{
     display: flex;
     align-items: flex-start;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 
 }
 
@@ -2109,7 +2144,9 @@ border: 3px solid rgb(249, 106, 128);
     width:100%;
     background-color: white;
     color: black;
-    padding: 1rem 1rem;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 1rem;
+    padding-right: 1rem;
     display: flex;
     align-items: flex-start;
 }
@@ -2240,6 +2277,9 @@ button.btn-primary:hover {
   align-items: center;
   gap: 1rem;
   text-align: center;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .fat-slider-image img {
