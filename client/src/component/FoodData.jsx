@@ -87,7 +87,7 @@ export default function FoodData(props) {
         setTimeout(() => {
             const inputRect = input.getBoundingClientRect();
             const viewportHeight = window.visualViewport.height;
-            const buffer = 60; // pixels above the keyboard
+            const buffer = 10; // pixels above the keyboard
 
             // If input is too close to bottom, scroll it up
             if (inputRect.bottom > viewportHeight - buffer) {
