@@ -911,6 +911,7 @@ flex-wrap: wrap;
     /* padding: 1rem 1rem; */
     padding: 1rem 1.5rem 2.8rem 1.5rem; /* adjustment for the gap between footer*/
     height: auto;  
+    padding-top: env(safe-area-inset-top, 0px);
 }
 
 .weight-container span{
