@@ -11,7 +11,6 @@ html::-webkit-scrollbar {
 
 .container{
     height: 100vh;
-    height: 100dvh;    /* iOS 15+ support */
     width:100%;
     background-color: white;
     color: black;

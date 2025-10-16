@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "./Footer";
@@ -14,9 +14,6 @@ export default function FoodData(props) {
     const [initialEatenQuantity, setInitialEatenQuantity] = useState(quantity || 100); // New state for initial quantity
     const [mealNumber, setMealNumber] = useState(initialMealNumber || 1);
     const [csrfToken, setCsrfToken] = useState('');
-
-    const inputRef = useRef(null);
-    const [keyboardOpen, setKeyboardOpen] = useState(false);
 
     console.log('Initial EatenQuantity:', initialEatenQuantity);
 
@@ -79,44 +76,6 @@ export default function FoodData(props) {
             console.log('Food Initial set:', calculatedFood);
         }
     }, [details, initialEatenQuantity]); // Update dependency to initialEatenQuantity
-
-    useEffect(() => {
-    const input = inputRef.current;
-    if (!input || !window.visualViewport) return;
-
-    const handleFocus = () => {
-        setTimeout(() => {
-            const inputRect = input.getBoundingClientRect();
-            const viewportHeight = window.visualViewport.height;
-            const buffer = 80; // pixels above the keyboard
-
-            // If input is too close to bottom, scroll it up
-            if (inputRect.bottom > viewportHeight - buffer) {
-                window.scrollBy({
-                    top: inputRect.bottom - (viewportHeight - buffer),
-                    behavior: 'smooth'
-                });
-            }
-        }, 300); // wait for keyboard to appear
-    };
-
-    input.addEventListener('focus', handleFocus);
-    return () => input.removeEventListener('focus', handleFocus);
-}, []);
-
-useEffect(() => {
-  const handleViewportResize = () => {
-    if (window.visualViewport) {
-      setKeyboardOpen(window.visualViewport.height < window.innerHeight - 200);
-    }
-  };
-
-  window.visualViewport?.addEventListener("resize", handleViewportResize);
-
-  return () => {
-    window.visualViewport?.removeEventListener("resize", handleViewportResize);
-  };
-}, []);
 
     useEffect(() => {
         async function fetchCsrfToken() {
@@ -259,7 +218,7 @@ useEffect(() => {
 
     return (
         <section className="container fooddata-container">
-        {!keyboardOpen && <Footer />}
+        <Footer />
         <div className="food">
             {food && ( // Add conditional check here
                 <>
@@ -302,7 +261,6 @@ useEffect(() => {
                         <div className="food-quantity">
                             <span>Miktar:</span>   
                             <input
-                                ref={inputRef}
                                 type="number"
                                 onChange={calculateMacros}
                                 className="inp-quant"
