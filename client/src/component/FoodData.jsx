@@ -81,19 +81,26 @@ export default function FoodData(props) {
 
     useEffect(() => {
     const input = inputRef.current;
-    if (!input) return;
+    if (!input || !window.visualViewport) return;
 
     const handleFocus = () => {
         setTimeout(() => {
-            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
+            const inputRect = input.getBoundingClientRect();
+            const viewportHeight = window.visualViewport.height;
+            const buffer = 80; // pixels above the keyboard
+
+            // If input is too close to bottom, scroll it up
+            if (inputRect.bottom > viewportHeight - buffer) {
+                window.scrollBy({
+                    top: inputRect.bottom - (viewportHeight - buffer),
+                    behavior: 'smooth'
+                });
+            }
+        }, 300); // wait for keyboard to appear
     };
 
     input.addEventListener('focus', handleFocus);
-
-    return () => {
-        input.removeEventListener('focus', handleFocus);
-    };
+    return () => input.removeEventListener('focus', handleFocus);
 }, []);
 
     useEffect(() => {
