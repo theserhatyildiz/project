@@ -107,7 +107,7 @@ export default function FoodData(props) {
 useEffect(() => {
   const handleViewportResize = () => {
     if (window.visualViewport) {
-      setKeyboardOpen(window.visualViewport.height < window.innerHeight - 150);
+      setKeyboardOpen(window.visualViewport.height < window.innerHeight - 200);
     }
   };
 
