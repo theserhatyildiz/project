@@ -105,24 +105,17 @@ export default function FoodData(props) {
 }, []);
 
 useEffect(() => {
-    const viewport = window.visualViewport;
-
-    const handleResize = () => {
-        if (!viewport) return;
-
-        const isKeyboardOpen = window.innerHeight > viewport.height;
-        setKeyboardOpen(isKeyboardOpen);
-    };
-
-    if (viewport) {
-        viewport.addEventListener("resize", handleResize);
+  const handleViewportResize = () => {
+    if (window.visualViewport) {
+      setKeyboardOpen(window.visualViewport.height < window.innerHeight - 150);
     }
+  };
 
-    return () => {
-        if (viewport) {
-            viewport.removeEventListener("resize", handleResize);
-        }
-    };
+  window.visualViewport?.addEventListener("resize", handleViewportResize);
+
+  return () => {
+    window.visualViewport?.removeEventListener("resize", handleViewportResize);
+  };
 }, []);
 
     useEffect(() => {
