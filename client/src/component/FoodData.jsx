@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import Footer from "./Footer";
@@ -14,6 +14,8 @@ export default function FoodData(props) {
     const [initialEatenQuantity, setInitialEatenQuantity] = useState(quantity || 100); // New state for initial quantity
     const [mealNumber, setMealNumber] = useState(initialMealNumber || 1);
     const [csrfToken, setCsrfToken] = useState('');
+
+    const inputRef = useRef(null);
 
     console.log('Initial EatenQuantity:', initialEatenQuantity);
 
@@ -76,6 +78,23 @@ export default function FoodData(props) {
             console.log('Food Initial set:', calculatedFood);
         }
     }, [details, initialEatenQuantity]); // Update dependency to initialEatenQuantity
+
+    useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const handleFocus = () => {
+        setTimeout(() => {
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    };
+
+    input.addEventListener('focus', handleFocus);
+
+    return () => {
+        input.removeEventListener('focus', handleFocus);
+    };
+}, []);
 
     useEffect(() => {
         async function fetchCsrfToken() {
@@ -261,6 +280,7 @@ export default function FoodData(props) {
                         <div className="food-quantity">
                             <span>Miktar:</span>   
                             <input
+                                ref={inputRef}
                                 type="number"
                                 onChange={calculateMacros}
                                 className="inp-quant"
