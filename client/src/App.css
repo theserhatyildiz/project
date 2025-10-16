@@ -347,8 +347,6 @@ a {
 .fooddata-container{
     display: flex;
     align-items: flex-start;
-    padding-top: env(safe-area-inset-top);
-    height: 100dvh;
 }
 
 .food{

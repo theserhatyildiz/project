@@ -16,6 +16,7 @@ export default function FoodData(props) {
     const [csrfToken, setCsrfToken] = useState('');
 
     const inputRef = useRef(null);
+    const [keyboardOpen, setKeyboardOpen] = useState(false);
 
     console.log('Initial EatenQuantity:', initialEatenQuantity);
 
@@ -87,7 +88,7 @@ export default function FoodData(props) {
         setTimeout(() => {
             const inputRect = input.getBoundingClientRect();
             const viewportHeight = window.visualViewport.height;
-            const buffer = -100; // pixels above the keyboard
+            const buffer = 80; // pixels above the keyboard
 
             // If input is too close to bottom, scroll it up
             if (inputRect.bottom > viewportHeight - buffer) {
@@ -101,6 +102,27 @@ export default function FoodData(props) {
 
     input.addEventListener('focus', handleFocus);
     return () => input.removeEventListener('focus', handleFocus);
+}, []);
+
+useEffect(() => {
+    const viewport = window.visualViewport;
+
+    const handleResize = () => {
+        if (!viewport) return;
+
+        const isKeyboardOpen = window.innerHeight > viewport.height;
+        setKeyboardOpen(isKeyboardOpen);
+    };
+
+    if (viewport) {
+        viewport.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+        if (viewport) {
+            viewport.removeEventListener("resize", handleResize);
+        }
+    };
 }, []);
 
     useEffect(() => {
@@ -244,7 +266,7 @@ export default function FoodData(props) {
 
     return (
         <section className="container fooddata-container">
-        <Footer />
+        {!keyboardOpen && <Footer />}
         <div className="food">
             {food && ( // Add conditional check here
                 <>
