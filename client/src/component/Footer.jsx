@@ -99,7 +99,7 @@ export default function Footer() {
                 <span style={{ fontSize: "0.90rem" }}>
                   (...) →
                   <img
-                    src="images/share-icon.png"
+                    src="public/images/share-icon.png"
                     style={{
                       width: "30px",
                       height: "30px",
