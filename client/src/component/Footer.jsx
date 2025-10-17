@@ -135,7 +135,7 @@ export default function Footer() {
                 📲 <strong>App'i yükle!</strong>
                 <br />
                 <span style={{ fontSize: "0.90rem" }}>
-                  Tarayıcı menüsünden <em>“Ana ekrana ekle”</em> seçeneğine dokun.
+                  Tarayıcı menüsü (⋮) → Aşağı kaydır → Ana ekrana ekle
                 </span>
                 <br />
               </div>
