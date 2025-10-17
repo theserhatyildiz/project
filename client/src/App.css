@@ -2365,8 +2365,8 @@ button.btn-primary:hover {
   top: 0;
   left: 0;
   width: 100%;
-  height: env(safe-area-inset-top); /* Occupies only the notch area */
-  background-color: rgb(104, 2, 2); /* Match your app's top background */
-  z-index: 9999;
-  pointer-events: none; /* Allows interaction with underlying elements */
+  z-index: 1000;
+  background-color: white;
+  padding: env(safe-area-inset-top) 1rem 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

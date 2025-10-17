@@ -26,7 +26,6 @@ import MacroCoach from './component/MacroCoach/MacroCoach'
 import CheckIn from './component/MacroCoach/CheckIn'
 import CheckInHistory from './component/MacroCoach/CheckInHistory'
 import CheckInReport from './component/MacroCoach/CheckInReport'
-import Header from './component/Header'
 
 
 import { UserContext } from './context/UserContext'
@@ -48,7 +47,6 @@ function App() {
     return (
         <UserContext.Provider value={{ loggedUser, setLoggedUser, currentDateView, setCurrentDateView }}>
             <BrowserRouter>
-             <Header />
                 <Routes>
                     {/* Register & Login */}
                     <Route path='/' element={<Diet />} />
