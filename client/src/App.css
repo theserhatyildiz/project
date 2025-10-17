@@ -3,6 +3,7 @@ html {
     overflow-y: scroll;               /* Enables scrolling */
     scrollbar-width: none;           /* Firefox */
     -ms-overflow-style: none;        /* IE and Edge */
+    overscroll-behavior: none;
   }
   
 html::-webkit-scrollbar {
