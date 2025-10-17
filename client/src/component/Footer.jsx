@@ -55,10 +55,13 @@ export default function Footer() {
     const userAgent = navigator.userAgent.toLowerCase();
     if (/iphone|ipad|ipod/.test(userAgent)) {
       setPlatform("ios");
+      console.log("📱 Detected platform: iOS");
     } else if (/android/.test(userAgent)) {
       setPlatform("android");
+      console.log("🤖 Detected platform: Android")
     } else {
       setPlatform(null); // not mobile or unsupported platform
+      console.log("🖥️ Detected platform: Other or unsupported");
     }
   }, []);
 
