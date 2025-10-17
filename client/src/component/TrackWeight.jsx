@@ -543,8 +543,10 @@ const sendWeightAverages = async () => {
 };
 
 return (
+    <>
+    <Header />
     <section className="container weight-container">
-        <Header />
+        
         <Footer />
 
         {loading ? (
@@ -704,5 +706,6 @@ return (
             </div>
         )}
     </section>
+    </>
 )}
 

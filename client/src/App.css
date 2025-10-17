@@ -2357,3 +2357,16 @@ button.btn-primary:hover {
   font-size: 0.95rem;
   z-index: 10;
 }
+
+/* Header.css */
+
+.notch-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: env(safe-area-inset-top); /* Occupies only the notch area */
+  background-color: rgb(104, 2, 2); /* Match your app's top background */
+  z-index: 9999;
+  pointer-events: none; /* Allows interaction with underlying elements */
+}
