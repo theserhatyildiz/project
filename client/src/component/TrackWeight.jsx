@@ -547,7 +547,7 @@ return (
     <Header />
     <section className="container weight-container">
         
-        <Footer />
+        
 
         {loading ? (
             <div className="spinner-container">
@@ -706,6 +706,7 @@ return (
             </div>
         )}
     </section>
+    <Footer />
     </>
 )}
 
