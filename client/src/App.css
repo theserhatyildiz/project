@@ -914,7 +914,7 @@ flex-wrap: wrap;
     padding-top: env(safe-area-inset-top, 0px);
 }
 
-.weight-container span{
+.weight-container .section-title{
     font-weight: bold;
     text-decoration: underline;
     display: flex;
@@ -2342,3 +2342,18 @@ button.btn-primary:hover {
   margin: 0 1rem;
 }
 
+/* install banner css */
+.install-banner {
+  position: fixed; 
+  bottom: 5.2rem;       /* ✅ Matches height of your footer */
+  left: 0;
+  right: 0;
+  background: rgb(215, 55, 80);
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  z-index: 10;
+}

@@ -560,7 +560,7 @@ return (
         ) : (
             <div>
                 {/* <span onClick={handleEntryClick}>Kilo Girişi</span> */}
-                <span>Kilo Girişi</span>
+                <span className="section-title">Kilo Girişi</span>
         
                 <div className="weight-entry">
                     {showEntryField && (
