@@ -273,7 +273,7 @@ a {
 
 .countdown-message{
     color: #F37E90;
-    /* font-weight: bold; */
+    font-weight: bold;
     margin-top: 0.5rem;
 }
 
