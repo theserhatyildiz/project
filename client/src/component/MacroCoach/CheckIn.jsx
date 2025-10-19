@@ -11,7 +11,7 @@ export default function CheckIn() {
   const navigate = useNavigate();
 
   // ==== TEST SWITCH (force enable the button even if locked) ====
-  const TEST_FORCE_UNLOCK = false; // set true while testing UI
+  const TEST_FORCE_UNLOCK = true; // set true while testing UI
   const [isLocked, setIsLocked] = useState(true);
 
   const [formData, setFormData] = useState(null);          // goal, goalSpeed, weight
@@ -79,6 +79,11 @@ export default function CheckIn() {
       }
     })();
   }, [loggedUser]);
+
+  useEffect(() => {
+  const locked = !TEST_FORCE_UNLOCK && isCheckinLockedWeekly();
+  setIsLocked(locked);
+}, [lastCheckInAt, submitting, TEST_FORCE_UNLOCK]);
 
   // --- form data (goal, goalSpeed, weight)
   useEffect(() => {
