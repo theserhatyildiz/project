@@ -591,6 +591,12 @@ export default function CheckIn() {
   return "adherence-red"; // anything else: under or over
 };
 
+   // ------------------- CALCULATE WEIGHT DIFFERENCE -------------------
+  const weightChange =
+  (weightAverages?.weeklyAverage ?? 0) -
+  (weightAverages?.previousWeeklyAverage ?? 0);
+  const weightChangeRounded = weightChange.toFixed(1);
+
   return (
     <section className="container macrocoach-container">
       <Footer />
@@ -671,7 +677,7 @@ export default function CheckIn() {
 
             {weightAverages && (
               <div className="weight-averages">
-                <p className="weight-header">Kilo Değişimi:</p>
+                <p className="weight-header">Kilo Değişimi:{weightChangeRounded > 0 ? "+" : ""}  {weightChangeRounded}kg</p>
                 <ul className="weight-avg-list">
                   <li className="weight-avg-item">
                     <span className="wa-label">Güncel Haftalık Ortalama: </span>
