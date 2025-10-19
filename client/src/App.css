@@ -271,6 +271,12 @@ a {
     margin-top: -0.8rem;
 }
 
+.countdown-message{
+    color: #F37E90;
+    /* font-weight: bold; */
+    margin-top: 0.5rem;
+}
+
 /* search food page css */
 
 .search-container{
