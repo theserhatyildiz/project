@@ -11,7 +11,7 @@ export default function CheckIn() {
   const navigate = useNavigate();
 
   // ==== TEST SWITCH (force enable the button even if locked) ====
-  const TEST_FORCE_UNLOCK = true; // set true while testing UI
+  const TEST_FORCE_UNLOCK = false; // set true while testing UI
   const [isLocked, setIsLocked] = useState(true);
 
   const [formData, setFormData] = useState(null);          // goal, goalSpeed, weight
