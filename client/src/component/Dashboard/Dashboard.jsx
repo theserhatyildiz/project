@@ -371,6 +371,12 @@ useEffect(() => {
                     <span className="macro-coach-text">gün kaldı</span>
                   </div>
                 </div>
+                {/* ✅ Show message when daysLeft === 0 */}
+                  {daysLeft === 0 && (
+                    <div className = "countdown-message" >
+                      ✅ Check-in yapabilirsiniz!
+                    </div>
+                  )}
               </div>
             )}
           </>
