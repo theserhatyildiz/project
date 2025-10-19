@@ -698,7 +698,7 @@ export default function CheckIn() {
               disabled={buttonLocked}
               aria-disabled={buttonLocked}
               title={
-                locked
+                isLocked
                   ? "Haftalık check-in: Son check-in tarihinden 7 gün sonra, 00:01’de yeniden mümkün."
                   : "Check-in'i tamamla"
               }
