@@ -196,10 +196,9 @@ export default function CheckIn() {
               return toLocalYMD(d);
             });
           } else {
-            // Full week has passed → calculate current week window
-            const currentWeekIndex = Math.floor(daysElapsed / 7);
-            const weekStart = new Date(start);
-            weekStart.setDate(weekStart.getDate() + currentWeekIndex * 7);
+            // New weekly range: always last 7 full days (excluding today)
+            const weekStart = new Date(today);
+            weekStart.setDate(weekStart.getDate() - 7); // go back 7 days
 
             weeklyKeys = Array.from({ length: 7 }, (_, i) => {
               const d = new Date(weekStart);
