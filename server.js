@@ -1486,7 +1486,10 @@ app.post('/macrocoach/macros/:userId', async (req, res) => {
       console.warn('⚠️ User not found when updating markers:', userId);
     }
 
-    return res.status(201).json(created);
+    return res.status(201).json({
+    ...created.toObject(), // macro snapshot
+    lastCheckInAt: user?.lastCheckInAt || null,
+    });
 
   } catch (error) {
     console.error('❌ Error saving macros snapshot:', error);

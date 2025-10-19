@@ -12,6 +12,7 @@ export default function CheckIn() {
 
   // ==== TEST SWITCH (force enable the button even if locked) ====
   const TEST_FORCE_UNLOCK = true; // set true while testing UI
+  const [isLocked, setIsLocked] = useState(true);
 
   const [formData, setFormData] = useState(null);          // goal, goalSpeed, weight
   const [dailyMacroTotals, setDailyMacroTotals] = useState([]);
@@ -461,12 +462,11 @@ export default function CheckIn() {
   };
 
   // Button state (respect test override)
-  const locked = !TEST_FORCE_UNLOCK && isCheckinLockedWeekly();
-  const buttonLocked = locked || submitting;
+  const buttonLocked = isLocked || submitting;
   useEffect(() => {
-    console.log("🚦 Button render state:", buttonLocked ? "LOCKED (weekly 00:01 rule)" : "ACTIVE",
-                "| TEST_FORCE_UNLOCK =", TEST_FORCE_UNLOCK);
-  }, [buttonLocked, lastCheckInAt, submitting, TEST_FORCE_UNLOCK]);
+  console.log("🚦 Button render state:", isLocked ? "LOCKED (weekly 00:01 rule)" : "ACTIVE",
+              "| TEST_FORCE_UNLOCK =", TEST_FORCE_UNLOCK);
+  }, [isLocked, TEST_FORCE_UNLOCK]);
 
   // --- CHECK-IN BUTTON HANDLER (with min spinner time)
   const handleCheckin = async () => {
@@ -525,14 +525,33 @@ export default function CheckIn() {
         }),
       });
 
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`Save failed: ${res.status} ${txt}`);
-      }
+      let created;
+        try {
+          created = await res.json();
+          console.log("📦 Created snapshot response:", created);
+        } catch (e) {
+          const txt = await res.text();
+          console.error("❌ Failed to parse JSON from response:", e);
+          console.error("🔍 Raw response text:", txt);
+          throw new Error(`Failed to parse JSON: ${txt}`);
+        }
 
-      const created = await res.json();
+        if (!created || !created.lastCheckInAt) {
+          console.warn("⚠️ No lastCheckInAt returned from backend! Here's what we got:", created);
+        } else {
+          setLastCheckInAt(created.lastCheckInAt);
+          const locked = !TEST_FORCE_UNLOCK && isCheckinLockedWeekly(created.lastCheckInAt);
+          setIsLocked(locked);
+          console.log("⏱️ lastCheckInAt updated (POST response):", created.lastCheckInAt);
+        }
+
       if (created?.lastCheckInAt) {
-        setLastCheckInAt(created.lastCheckInAt); // keep client in sync for lock
+        setLastCheckInAt(created.lastCheckInAt);
+
+        // ✅ Immediately recalculate lock state using new date
+        const locked = !TEST_FORCE_UNLOCK && isCheckinLockedWeekly(created.lastCheckInAt);
+        setIsLocked(locked);
+
         console.log("⏱️ lastCheckInAt updated (POST response):", created.lastCheckInAt);
       }
 
