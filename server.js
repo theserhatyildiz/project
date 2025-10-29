@@ -1268,6 +1268,38 @@ app.delete("/weights/:id", verifyToken, async (req, res) => {
     }
 });
 
+// GET - Fetch start date
+app.get("/users/:userId/startdate", verifyToken, async (req, res) => {
+    const user = await userModel.findById(req.params.userId);
+    res.status(200).json({ 
+        weightTrackingStartDate: user.weightTrackingStartDate || null 
+    });
+});
+
+// PUT - Set start date
+app.put("/users/:userId/:startDate", verifyToken, async (req, res) => {
+    const { weightTrackingStartDate } = req.body;
+    const updatedUser = await userModel.findByIdAndUpdate(
+        req.params.userId,
+        { weightTrackingStartDate: new Date(weightTrackingStartDate) },
+        { new: true }
+    );
+    res.status(200).json({ 
+        message: "Start date updated",
+        weightTrackingStartDate: updatedUser.weightTrackingStartDate
+    });
+});
+
+// DELETE - Remove start date
+app.delete("/users/:userId/startdate", verifyToken, async (req, res) => {
+    await userModel.findByIdAndUpdate(
+        req.params.userId,
+        { $unset: { weightTrackingStartDate: "" } }
+    );
+    res.status(200).json({ message: "Start date deleted" });
+});
+
+
 // Weight Averages
 app.post('/weights/averages', async (req, res) => {
   try {

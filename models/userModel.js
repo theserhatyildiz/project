@@ -13,7 +13,7 @@ const userSchema = mongoose.Schema({
         type: String,  
         required: true
     },
-    startDate: {
+    weightTrackingStartDate: {
         type: Date,
         default: null // Bu kisi kilo takibi icin yeni bir baslangic tarihi secmede kullaniliyor
     },
