@@ -40,7 +40,7 @@ export default function TrackWeight() {
     useEffect(() => {
         async function fetchCsrfToken() {
             try {
-                const response = await fetch("http://localhost:8000/csrf-token", { credentials: 'include' });
+                const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/csrf-token", { credentials: 'include' });
                 const { csrfToken } = await response.json();
                 console.log('CSRF Token fetched:', csrfToken);
                 if (csrfToken) {
@@ -120,7 +120,7 @@ export default function TrackWeight() {
     
         const fetchEntriesForMonth = async (month, choice) => {
             try {
-                const response = await fetch(`http://localhost:8000/weights/${userId}/${year}/${month}?choice=${choice}`, {
+                const response = await fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/weights/${userId}/${year}/${month}?choice=${choice}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -202,7 +202,7 @@ export default function TrackWeight() {
     }
 
     const createWeightEntry = (formData) => {
-        fetch("http://localhost:8000/weights", {
+        fetch("https://galwinapp1-c1d71c579009.herokuapp.com/weights", {
             method: "POST",
             body: JSON.stringify(formData),
             headers: {
@@ -242,7 +242,7 @@ export default function TrackWeight() {
             choice: wcDetails.choice
         };
 
-        fetch(`http://localhost:8000/weights/${entryId}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/weights/${entryId}`, {
             method: "PUT",
             body: JSON.stringify(formData),
             headers: {
@@ -279,7 +279,7 @@ export default function TrackWeight() {
     }
 
     const handleDelete = (entryId) => {
-        fetch(`http://localhost:8000/weights/${entryId}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/weights/${entryId}`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${loggedData.loggedUser.token}`,
@@ -347,7 +347,7 @@ export default function TrackWeight() {
         const userId = loggedData.loggedUser.userid;
         const token = loggedData.loggedUser.token;
 
-        fetch(`http://localhost:8000/users/${userId}/${newStartDate}`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/users/${userId}/${newStartDate}`, {
             method: "PUT",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -372,7 +372,7 @@ export default function TrackWeight() {
     const fetchStartDateFromServer = () => {
         const userId = loggedData.loggedUser.userid;
         const token = loggedData.loggedUser.token;
-        fetch(`http://localhost:8000/users/${userId}/startdate`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/users/${userId}/startdate`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -402,7 +402,7 @@ export default function TrackWeight() {
     const handleDeleteStartDate = () => {
         const userId = loggedData.loggedUser.userid;
         const token = loggedData.loggedUser.token;
-        fetch(`http://localhost:8000/users/${userId}/startdate`, {
+        fetch(`https://galwinapp1-c1d71c579009.herokuapp.com/users/${userId}/startdate`, {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -428,7 +428,7 @@ export default function TrackWeight() {
 
     const sendWeightAverages = async (metrics) => {
       try {
-        const response = await fetch("http://localhost:8000/weights/averages", {
+        const response = await fetch("https://galwinapp1-c1d71c579009.herokuapp.com/weights/averages", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${loggedData.loggedUser.token}`,
